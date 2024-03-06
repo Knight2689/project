@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增商品</title>
+    <link rel="stylesheet" href="{% static './css/bootstrap.min.css' %}">
+    <!--link rel="stylesheet" href="{% static './adminlogin.css' %}"-->
+</head>
+<body>
+<div class="container">
+    <h1>Create New Product</h1>
+    <form method="post" action="/product/create/" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="product_name" class="form-label">Product Name:</label>
+            <input type="text" class="form-control" id="product_name" name="product_name">
+        </div>
+        
+        <div class="mb-3">
+            <label for="price" class="form-label">Price:</label>
+            <input type="number" class="form-control" id="price" name="price">
+        </div>
+        
+        <div class="mb-3">
+            <label for="type_id" class="form-label">Product Type:</label>
+            <select class="form-select" id="type_id" name="type_id">
+                <!-- Iterate over product_types passed from the view -->
+                {% for type in product_types %}
+                    <!-- Use the 'id' and 'type_name' attributes of each ProductTypeModel object -->
+                    <option value="{{ type.id }}">{{ type.type_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label for="color_id" class="form-label">Color:</label>
+            <select class="form-select" id="color_id" name="color_id">
+                <!-- Iterate over colors passed from the view -->
+                {% for color in colors %}
+                    <!-- Use the 'id' and 'color_name' attributes of each ColorModel object -->
+                    <option value="{{ color.id }}">{{ color.color_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label for="size_id" class="form-label">Size:</label>
+            <select class="form-select" id="size_id" name="size_id">
+                <!-- Iterate over sizes passed from the view -->
+                {% for size in sizes %}
+                    <!-- Use the 'id' and 'size_name' attributes of each SizeModel object -->
+                    <option value="{{ size.id }}">{{ size.size_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="stock" class="form-label">Stock:</label>
+            <input type="number" class="form-control" id="stock" name="stock">
+        </div>
+        
+        <div class="mb-3">
+            <label for="image" class="form-label">Image:</label>
+            <input type="file" class="form-control" id="image" name="image">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Create Product</button>
+    </form>
+</div>
+</body>
+</html>

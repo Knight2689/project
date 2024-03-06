@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Encounter M{% endblock %} - {% block page_title %}首頁{% endblock %}</title>
+    <!-- 引入Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- 自訂CSS -->
+    {% comment %} <link rel="stylesheet" href="styles.css"> {% endcomment %}
+    <!-- Font Awesome 圖標庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-6ABObrwCRORVih5OcT4Bn4OVJk4eJF5B51+G8CndT7+FdMA8NkXWO1tQv3tDS8PC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <!-- 導航 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Encounter M</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">首頁</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">關於我們</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">服務</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">作品集</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">聯絡我們</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center align-items-center">
+            <p id="cart_text" class="d-md-inline">
+                <div>
+                    {% if user_id %}
+                        <div>
+                            <a href="{% url 'logout' %}" id="sign_in">
+                                <span class="bi bi-box-arrow-right"></span>{{ user.Username }}  登出
+                            </a>
+                        </div>
+                    {% else %}
+                        <div>
+                            <a href="{% url 'login' %}" id="sign_in">
+                                <span id="member" class="bi bi-person"></span>{{ user.Username }}  
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+        </div> 
+    </nav>
+
+    <!-- 頁首 -->
+    <header class="jumbotron jumbotron-fluid text-center">
+        <div class="container">
+            <h1 class="display-4">{% block header_title %}歡迎來到OBDesign{% endblock %}</h1>
+            <p class="lead">{% block header_text %}我們專注於為您帶來最優質的設計服務，讓您的品牌脫穎而出。{% endblock %}</p>
+            {% block header_button %}
+            <a href="#" class="btn btn-primary btn-lg">了解更多</a>
+            {% endblock %}
+        </div>
+    </header>
+
+    <!-- 主要內容 -->
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h3>關於我們</h3>
+                    <p>Encounter M是一家專業的設計公司，我們致力於為客戶提供最優質的設計和創意。</p>
+                </div>
+                <div class="col-md-4">
+                    <h3>聯絡我們</h3>
+                    <p>地址：1234 台灣省 台北市</p>
+                    <p>電話：+886-123-456789</p>
+                    <p>Email：info@obdesign.com.tw</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- 引入Bootstrap JS和相關依賴 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
