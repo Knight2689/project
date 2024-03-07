@@ -1,7 +1,6 @@
 from django.db import models
 import datetime
 
-
 class PageView(models.Model):
     page_name = models.CharField(max_length=255)  #頁面名稱
     total_views = models.IntegerField(default=0)  # 累計瀏覽次數
@@ -18,7 +17,19 @@ class registered_user(models.Model):
     Useraddress = models.CharField(max_length=255,blank=True, default='') #會員地址
     Isblacklisted = models.BooleanField(default=False)  # 黑名單欄位
 
+class OrdersModel(models.Model):
+    subtotal = models.IntegerField(default=0) #購物金額
+    shipping = models.IntegerField(default=0) #運費
+    grandtotal = models.IntegerField(default=0) #購物總金額
+    customname =  models.CharField(max_length=100, default='') #購買者姓名
+    customemail = models.ForeignKey('registered_user', on_delete=models.CASCADE, related_name='orders') #購買者信箱
+    customaddress =  models.CharField(max_length=100, default='') #購買者地址
+    customphone =  models.CharField(max_length=100, default='') #購買者手機
+    shipping_method = models.CharField(max_length=50, default='') #寄送方式
+    paytype =  models.CharField(max_length=50, default='') #付款方式
+
 class Products(models.Model):
+    dorder = models.ForeignKey('OrdersModel', on_delete=models.CASCADE) #訂單
     ProductID = models.AutoField(primary_key=True, verbose_name='商品ID')
     ProductName = models.CharField(max_length=100, verbose_name='商品名稱' , default='')
     Price = models.IntegerField(default=0, verbose_name='價格') 
