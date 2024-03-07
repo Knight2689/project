@@ -28,6 +28,15 @@ class OrdersModel(models.Model):
     shipping_method = models.CharField(max_length=50, default='') #寄送方式
     paytype =  models.CharField(max_length=50, default='') #付款方式
 
+class DetailModel(models.Model):
+    dorder = models.ForeignKey('OrdersModel', on_delete=models.CASCADE) #訂單
+    dname = models.ForeignKey('Products', on_delete=models.CASCADE) #商品名稱
+    dcolor = models.ForeignKey('ColorModel', on_delete=models.CASCADE)  # 顏色
+    dsize = models.ForeignKey('SizeModel', on_delete=models.CASCADE)   # 尺寸
+    dunitprice = models.IntegerField(default=0) #商品單價
+    dquantity = models.IntegerField(default=0) #商品數量
+    dtotal = models.IntegerField(default=0) #商品總價
+
 class Products(models.Model):
     dorder = models.ForeignKey('OrdersModel', on_delete=models.CASCADE) #訂單
     ProductID = models.AutoField(primary_key=True, verbose_name='商品ID')
@@ -84,3 +93,11 @@ class DescriptionModel(models.Model):
     class Meta:
         verbose_name = '商品敘述'
         verbose_name_plural = '商品敘述'
+
+#商品顏色尺寸庫存
+class ProductColorSizeStockModel(models.Model):
+    InventoryID = models.AutoField(primary_key=True, verbose_name='ID')
+    Product_id = models.ForeignKey(Products, on_delete=models.CASCADE, verbose_name='商品ID', related_name='productcolorsizestocks')
+    Color_id = models.ForeignKey(ColorModel, on_delete=models.CASCADE, verbose_name='顏色ID', related_name='productcolorsizestocks')
+    Size_id = models.ForeignKey(SizeModel, on_delete=models.CASCADE, verbose_name='尺寸ID', related_name='productcolorsizestocks')
+    Stock = models.PositiveIntegerField(default=0, verbose_name='庫存') 
