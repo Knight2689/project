@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from smtplib import SMTP, SMTPAuthenticationError, SMTPException
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
 from django.contrib import auth
 from django.urls import reverse
 from django.http import HttpResponse
@@ -168,6 +169,84 @@ def managementcreatedata(request):  #新增權限管理
         return redirect("/managementlist/")
     else:
         return render(request,"managementcreatedata.html",locals()) 
+
+@csrf_exempt
+def managementedit(request, id=None):  #編輯權限管理
+    if request.method == "POST":
+        username = request.POST.get("username",None)
+        password = request.POST.get("password", None)
+        if password is not None:
+            hashed_password = make_password(password)
+        email = request.POST.get("email",None)
+        first_name = request.POST.get("first_name",None)
+        last_name = request.POST.get("last_name",None)
+        is_superuser= int(request.POST.get("is_superuser", 0))
+        is_staff = int(request.POST.get("is_staff", 0))
+        is_active= int(request.POST.get("is_active", 0))
+        print('is_superuser=',is_superuser,'is_staff=',is_staff,'is_active',is_active) #除錯用
+        update = User.objects.get(id=id)
+        update.username = username
+        update.password = hashed_password
+        update.email = email
+        update.first_name = first_name
+        update.last_name = last_name
+        update.is_superuser = is_superuser
+        update.is_staff = is_staff
+        update.is_active = is_active
+        update.save()
+        return redirect('/managementlist/')
+    
+    else:
+        update = User.objects.get(id=id)
+        return render(request,"managementedit.html",locals()) 
+
+@csrf_exempt    
+def managementdelete(request, id=None):  #刪除權限管理
+    if request.method == "POST":
+        data = User.objects.get(id=id)
+        data.delete()
+        return redirect("/managementlist/")
+    else:
+        dict_data = User.objects.get(id=id)
+        return render(request,"managementdelete.html",locals())   
+
+@csrf_exempt
+def listall(request):  #會員管理
+    if 'site_search' in request.POST:
+        site_search = request.POST["site_search"]
+        site_search = site_search.strip() #去空白
+        keywords = site_search.split(" ")#字元切割
+        q_objects = Q()
+        for keyword in keywords:
+            if keyword != "":
+                status = True
+                if keyword == "男":
+                    keyword = "M"
+                elif keyword == "女":
+                    keyword = "F"
+                elif keyword == "是":
+                    q_objects.add(Q(Isblacklisted=1), Q.OR)
+                elif keyword == "否":
+                    q_objects.add(Q(Isblacklisted=0), Q.OR)
+                q_objects.add(Q(Username__contains=keyword),Q.OR)
+                q_objects.add(Q(Usersex__contains=keyword),Q.OR)
+                q_objects.add(Q(Userbirthday__contains=keyword),Q.OR)
+                q_objects.add(Q(Usertel__contains=keyword),Q.OR)
+                q_objects.add(Q(Usermail__contains=keyword),Q.OR)
+                q_objects.add(Q(Passwd__contains=keyword),Q.OR)
+                q_objects.add(Q(Useraddress__contains=keyword),Q.OR)
+            resultList = registered_user.objects.filter(q_objects)
+    else:   
+        resultList =  registered_user.objects.all().order_by('id') 
+
+    if not resultList:
+        errormessage="無資料"
+        status = False
+    else:
+        errormessage=""
+        status = True
+    return render(request,"listall.html",locals())
+
 
 #使用者
 def subject(request):#首頁

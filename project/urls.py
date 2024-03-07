@@ -31,7 +31,8 @@ urlpatterns = [
     path('product/create/', views.product_create, name='product_create'),
     path('managementlist/',views.managementlist),  #權限管理
     path('managementcreatedata/',views.managementcreatedata),  #新增權限管理
-
+    path('managementedit/<int:id>/',views.managementedit),  #編輯權限管理
+    path('managementdelete/<int:id>/',views.managementdelete),  #刪除權限管理
     
     #使用者
     #path('',views,subject),

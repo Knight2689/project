@@ -18,13 +18,13 @@
                         {% if request.user.is_authenticated %}
                             <div>
                                 <a href="/adminlogout/" id="sign_in">
-                                    <img src="{% static './images/member4_0.png' %}" id="member" />{{ user.username }} / 登出
+                                    <span class="bi bi-box-arrow-right"></span>{{ user.Username }} / 登出
                                 </a>
                             </div>
                         {% else %}
                             <div>
                                 <a href="/adminlogin/" id="sign_in">
-                                    <img src="{% static './images/member4_0.png' %}" id="member" />登入
+                                    <span id="member" class="bi bi-person"  id="member"></span> 登入
                                 </a>
                             </div>
                         {% endif %}
@@ -176,35 +176,40 @@
                 pagination.style.display = 'none';
             } else {
                 pagination.style.display = 'block';
-    
+        
                 // 清空分頁元素
                 pagination.innerHTML = '';
-    
+        
                 // 添加上一頁鏈接
                 if (currentPage > 1) {
                     pagination.appendChild(createPageLink(currentPage - 1, 'Previous', '&laquo;'));
                 }
-    
+        
                 // 計算要顯示的頁碼範圍
                 var startPage = Math.max(currentPage - Math.floor(maxVisiblePages / 2), 1);
                 var endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
-
+        
                 // 如果末尾頁碼不足 maxVisiblePages，則調整 startPage
                 if (endPage - startPage + 1 < maxVisiblePages) {
                     startPage = Math.max(endPage - maxVisiblePages + 1, 1); // 确保 startPage 不小于1
                 }
-    
+        
                 // 添加頁碼鏈接
                 for (var i = startPage; i <= endPage; i++) {
                     pagination.appendChild(createPageLink(i, 'Page ' + i, i.toString()));
                 }
-    
+        
+                // 如果當前頁在第四頁之後，並且總頁數大於四，則動態添加第四頁的鏈接
+                if (currentPage > maxVisiblePages && totalPages > maxVisiblePages) {
+                    pagination.appendChild(createPageLink(maxVisiblePages, 'Page ' + maxVisiblePages, maxVisiblePages.toString()));
+                }
+        
                 // 添加下一頁鏈接
                 if (currentPage < totalPages) {
                     pagination.appendChild(createPageLink(currentPage + 1, 'Next', '&raquo;'));
                 }
             }
-    
+        
             // 更新下拉選單的選項
             updatePageSelect();
         }
