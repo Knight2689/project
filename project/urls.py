@@ -33,7 +33,15 @@ urlpatterns = [
     path('managementcreatedata/',views.managementcreatedata),  #新增權限管理
     path('managementedit/<int:id>/',views.managementedit),  #編輯權限管理
     path('managementdelete/<int:id>/',views.managementdelete),  #刪除權限管理
-    
+    path('listall/',views.listall),  #會員管理
+    path('createdata/',views.createdata),  #新增會員管理
+    path('edit/<int:id>/',views.edit),  #編輯會員管理
+    path('delete/<int:id>/',views.delete),  #刪除會員管理
+    path('orders/',views.orders),  #收件管理
+    path('ordersedit/<int:id>/',views.ordersedit),  #編輯收件管理
+    path('ordersdelete/<int:id>/',views.ordersdelete),  #刪除收件管理
+
+
     #使用者
     #path('',views,subject),
     path('subject/',views.subject, name='subject'),

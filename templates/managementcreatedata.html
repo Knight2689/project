@@ -1,11 +1,14 @@
-{% block title %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
     {% load static %}
-    <title>新增權限管理</title> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增權限管理</title>   
     <link rel="stylesheet" href="{% static './managementcreatedata.css' %}">
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-{% endblock %}
-
-{% block content %}
+    <link rel="stylesheet" href="{% static './css/bootstrap.min.css' %}">
+</head>
+<body>
 <nav class="navbar navbar-expand-lg navbar-light" >
     <div class="container">
         <h1 class="title mx-auto"><b>權限管理-新增資料</b></h1>
@@ -61,4 +64,5 @@
         </table>
     </form>
 </div>
-{% endblock %}
+</body>
+</html>

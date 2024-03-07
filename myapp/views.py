@@ -2,7 +2,6 @@ import datetime
 import random
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from smtplib import SMTP, SMTPAuthenticationError, SMTPException
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
@@ -12,6 +11,7 @@ from django.http import HttpResponse
 from django.template import loader 
 from email.mime.multipart import MIMEMultipart #允許在一封郵件中包含多個部分，每個部分可以是文本、圖像、附件等。這在發送 HTML 郵件時特別有用，因為可以同時包含 HTML 和純文本版本，以便接收者的郵件客戶端可以根據其支持的格式來顯示郵件內容。
 from email.mime.text import MIMEText #創建 MIME 文本類型的郵件內容，例如純文本或 HTML 內容。
+from smtplib import SMTP, SMTPAuthenticationError, SMTPException
 from myapp import forms
 from .models import *
 from django.utils import timezone
@@ -247,6 +247,142 @@ def listall(request):  #會員管理
         status = True
     return render(request,"listall.html",locals())
 
+@csrf_exempt
+def createdata(request):  #新增會員管理
+    if request.method =="POST":
+        Username = request.POST.get("user-name",None)
+        Usersex = request.POST.get("user-sex",None)
+        Userbirthday = request.POST.get("user-birthday",None)
+        Usertel = request.POST.get("user-tel",None)
+        Usermail= request.POST.get("user-mail",None)
+        Passwd = request.POST.get("pass-wd",None)
+        Useraddress= request.POST.get("user-address",None)
+        Isblacklisted= int(request.POST.get("Isblacklisted", 0))
+        add = registered_user(Username=Username,Usersex=Usersex,Userbirthday=Userbirthday,Usertel=Usertel,Usermail=Usermail,Passwd=Passwd,Useraddress=Useraddress,Isblacklisted=Isblacklisted)
+        add.save()
+        return redirect("/listall/")
+        # return HttpResponse("Hello World")
+    else:
+        return render(request,"createdata.html",locals())
+    
+@csrf_exempt
+def edit(request, id=None):  #編輯會員管理
+    if request.method == "POST":
+        Username=request.POST['Username']
+        Usersex=request.POST['Usersex']
+        Passwd=request.POST['Passwd']
+        Userbirthday=request.POST['Userbirthday']
+        Usermail=request.POST['Usermail']
+        Usertel=request.POST['Usertel']
+        Useraddress=request.POST['Useraddress']
+        Isblacklisted= int(request.POST.get("Isblacklisted", 0))
+
+        update = registered_user.objects.get(id=id)
+        update.Username = Username
+        update.Usersex = Usersex
+        update.Passwd = Passwd
+        update.Userbirthday = Userbirthday
+        update.Usermail = Usermail
+        update.Usertel = Usertel
+        update.Useraddress = Useraddress
+        update.Isblacklisted = Isblacklisted
+        update.save()
+        return redirect('/listall/')
+    
+    else:
+        update = registered_user.objects.get(id=id)
+        # print(dict_data)
+        return render(request,"edit.html",locals())    
+    
+@csrf_exempt    
+def delete(request, id=None):  #刪除會員管理
+    # print(id)
+    if request.method == "POST":
+        data = registered_user.objects.get(id=id)
+        data.delete()
+        return redirect("/listall/")
+    else:
+        dict_data = registered_user.objects.get(id=id)
+        return render(request,"delete.html",locals()) 
+    
+@csrf_exempt   
+def orders(request):  # 收件管理
+    resultList = []  # 初始化為空列表
+    if 'site_search' in request.POST:
+        site_search = request.POST["site_search"]
+        site_search = site_search.strip()  # 去空白
+        keywords = site_search.split(" ")  # 字元切割
+        q_objects = Q()
+        for keyword in keywords:
+            if keyword != "":
+                status = True
+                print('keyword=', keyword)
+                
+                if keyword == "是":
+                    q_objects.add(Q(customemail__Isblacklisted=1), Q.OR)
+                elif keyword == "否":
+                    q_objects.add(Q(customemail__Isblacklisted=0), Q.OR)
+                q_objects.add(Q(id__contains=keyword),Q.OR)
+                q_objects.add(Q(customemail__Username__contains=keyword),Q.OR)
+                q_objects.add(Q(customemail__Usermail__contains=keyword),Q.OR)
+                q_objects.add(Q(customname__contains=keyword),Q.OR)
+                q_objects.add(Q(customphone__contains=keyword),Q.OR)
+                q_objects.add(Q(shipping_method__contains=keyword),Q.OR)
+                q_objects.add(Q(customaddress__contains=keyword),Q.OR)
+                q_objects.add(Q(paytype__contains=keyword),Q.OR)
+                q_objects.add(Q(subtotal__contains=keyword),Q.OR)
+                q_objects.add(Q(shipping__contains=keyword),Q.OR)
+                q_objects.add(Q(grandtotal__contains=keyword),Q.OR)
+        resultList = OrdersModel.objects.filter(q_objects)
+        
+    else:
+        resultList = OrdersModel.objects.all().order_by('id')
+        # print('resultList=',resultList)
+    if not resultList:
+        errormessage = "無資料"
+        status = False
+    else:
+        errormessage = ""
+        status = True
+    return render(request, "orders.html", locals())
+
+
+@csrf_exempt
+def ordersedit(request, id=None):  #編輯收件管理
+    if request.method == "POST":
+        customname = request.POST.get("customname", None)
+        customphone = request.POST.get("customphone",None)
+        subtotal = request.POST.get("subtotal",None)
+        shipping = request.POST.get("shipping",None)
+        grandtotal = request.POST.get("grandtotal",None)
+        shipping_method = request.POST.get("shipping_method",None)
+        customaddress = request.POST.get("customaddress",None)
+        paytype = request.POST.get("paytype",None)
+        update = OrdersModel.objects.get(id=id)
+        update.customname = customname
+        update.customphone = customphone
+        update.subtotal = subtotal
+        update.grandtotal = grandtotal
+        update.shipping_method = shipping_method
+        update.customaddress = customaddress
+        update.paytype = paytype
+        update.save()
+        return redirect('/orders/')
+    
+    else:
+        update = OrdersModel.objects.get(id=id)
+        return render(request,"ordersedit.html",locals()) 
+
+@csrf_exempt    
+def ordersdelete(request, id=None):  #刪除收件管理
+    if request.method == "POST":
+        data = OrdersModel.objects.get(id=id)
+        data.delete()
+        return redirect("/orders/")
+    else:
+        dict_data = OrdersModel.objects.get(id=id)
+        return render(request,"ordersdelete.html",locals())   
+
 
 #使用者
 def subject(request):#首頁
@@ -285,7 +421,7 @@ def login(request):  #登入
         postform = forms.PostForm()
         return render(request, "login.html",locals())
     
-  
+ 
         
 @csrf_exempt
 def signup(request):  #註冊
