@@ -40,7 +40,9 @@ urlpatterns = [
     path('orders/',views.orders),  #收件管理
     path('ordersedit/<int:id>/',views.ordersedit),  #編輯收件管理
     path('ordersdelete/<int:id>/',views.ordersdelete),  #刪除收件管理
-
+    path('ordertable/',views.ordertable),  #商品訂單
+    path('ordertableedit/<int:id>/',views.ordertableedit),  #編輯商品訂單
+    path('ordertabledelete/<int:id>/',views.ordertabledelete),  #刪除商品訂單
 
     #使用者
     #path('',views,subject),

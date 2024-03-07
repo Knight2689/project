@@ -28,6 +28,15 @@ class OrdersModel(models.Model):
     shipping_method = models.CharField(max_length=50, default='') #寄送方式
     paytype =  models.CharField(max_length=50, default='') #付款方式
 
+class DetailModel(models.Model):
+    dorder = models.ForeignKey('OrdersModel', on_delete=models.CASCADE) #訂單
+    dname = models.CharField(max_length=100, default='') #商品名稱
+    dcolor = models.CharField(max_length=50, default='')  # 顏色
+    dsize = models.CharField(max_length=20, default='')   # 尺寸
+    dunitprice = models.IntegerField(default=0) #商品單價
+    dquantity = models.IntegerField(default=0) #商品數量
+    dtotal = models.IntegerField(default=0) #商品總價
+
 class Products(models.Model):
     dorder = models.ForeignKey('OrdersModel', on_delete=models.CASCADE) #訂單
     ProductID = models.AutoField(primary_key=True, verbose_name='商品ID')

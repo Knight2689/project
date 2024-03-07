@@ -421,7 +421,68 @@ def login(request):  #登入
         postform = forms.PostForm()
         return render(request, "login.html",locals())
     
- 
+@csrf_exempt
+def ordertable(request):  #商品訂單
+    if 'site_search' in request.POST:
+        site_search = request.POST["site_search"]
+        site_search = site_search.strip() #去空白
+        keywords = site_search.split(" ")#字元切割
+        q_objects = Q()
+        for keyword in keywords:
+            if keyword != "":
+                status = True
+                q_objects.add(Q(dorder__id__contains=keyword), Q.OR)
+                q_objects.add(Q(dname__contains=keyword), Q.OR)
+                q_objects.add(Q(dcolor__contains=keyword), Q.OR)
+                q_objects.add(Q(dsize__contains=keyword), Q.OR)
+                q_objects.add(Q(dunitprice__contains=keyword), Q.OR)
+                q_objects.add(Q(dquantity__contains=keyword), Q.OR)
+                q_objects.add(Q(dtotal__contains=keyword), Q.OR)
+            resultList = DetailModel.objects.filter(q_objects)
+    else:    
+        resultList = DetailModel.objects.all().order_by('dorder_id')
+        print('resultList=',resultList)
+    if not resultList:
+        errormessage = "無資料"
+        status = False
+    else:
+        errormessage = ""
+        status = True
+    return render(request,"ordertable.html",locals())  
+
+@csrf_exempt
+def ordertableedit(request, id=None):  #編輯商品訂單
+    if request.method == "POST":
+        dname = request.POST.get("dname", None)
+        dcolor = request.POST.get("dcolor",None)
+        dsize = request.POST.get("dsize",None)
+        dunitprice = request.POST.get("dunitprice",0)
+        dquantity = request.POST.get("dquantity",0)
+        dtotal = request.POST.get("dtotal",0)
+        update = DetailModel.objects.get(id=id)
+        update.dname = dname
+        update.dcolor = dcolor
+        update.dsize = dsize
+        update.dunitprice = dunitprice
+        update.dquantity = dquantity
+        update.dtotal = dtotal
+        update.save()
+        return redirect('/ordertable/')
+    
+    else:
+        update = DetailModel.objects.get(id=id)
+        return render(request,"ordertableedit.html",locals()) 
+
+
+@csrf_exempt    
+def ordertabledelete(request, id=None):  #刪除商品訂單
+    if request.method == "POST":
+        data = DetailModel.objects.get(id=id)
+        data.delete()
+        return redirect("/ordertable/")
+    else:
+        dict_data = DetailModel.objects.get(id=id)
+        return render(request,"ordertabledelete.html",locals())  
         
 @csrf_exempt
 def signup(request):  #註冊
