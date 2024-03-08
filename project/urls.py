@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
 from myapp import views
-
+from myapp.views import get_product_types , get_product_colors , get_product_sizes , get_image
 
 
 urlpatterns = [
@@ -28,7 +28,7 @@ urlpatterns = [
     path('adminlogin/', views.adminlogin),  #管理者登入
     path('adminlogout/', views.adminlogout),  #管理者登出
     path('backgroundhome/',views.backgroundhome),  #後台首頁
-    path('product/create/', views.product_create, name='product_create'),
+    path('productcreate/', views.productcreate, name='productcreate'),
     path('managementlist/',views.managementlist),  #權限管理
     path('managementcreatedata/',views.managementcreatedata),  #新增權限管理
     path('managementedit/<int:id>/',views.managementedit),  #編輯權限管理
@@ -40,6 +40,19 @@ urlpatterns = [
     path('orders/',views.orders),  #收件管理
     path('ordersedit/<int:id>/',views.ordersedit),  #編輯收件管理
     path('ordersdelete/<int:id>/',views.ordersdelete),  #刪除收件管理
+    path('ordertable/',views.ordertable),  #商品訂單
+    path('ordertableedit/<int:id>/',views.ordertableedit),  #編輯商品訂單
+    path('ordertabledelete/<int:id>/',views.ordertabledelete),  #刪除商品訂單
+    path('inventorysheet/',views.inventorysheet),  #庫存查詢
+    path('image/<int:image_id>/', get_image, name='get_image'), #反應圖片成功與否
+
+    #API
+    path('api/product-types/', get_product_types, name='api-product-types'),
+    path('api/product-colors/', get_product_colors, name='api-product-colors'),
+    path('api/product-sizes/', get_product_sizes, name='api-product-sizes'),
+    path('api/add-product-type/', views.add_product_type, name='add_product_type'),
+    path('api/add-product-color/', views.add_product_color, name='add_product_color'),
+    path('api/add-product-size/', views.add_product_size, name='add_product_size'),
 
 
     #使用者
@@ -55,5 +68,8 @@ urlpatterns = [
     path('resetpassword/',views.resetpassword, name='resetpassword'),  #重設Encounter U服飾會員
     path('resetpasswordsuccessfulemail/', views.resetpasswordsuccessfulemail, name='resetpasswordsuccessfulemail'),  #重設密碼成功信
     path('logout/', views.logout, name='logout'),  #登出
+    path('classification/<str:type>/',views.classification, name='classification'),  #分類頁面
+    path('productcontent/<int:productid>/',views.productcontent, name='productcontent'),  #商品資訊
+
 ]
 

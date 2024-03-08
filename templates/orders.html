@@ -37,7 +37,7 @@
                             <a class="dropdown-item" href="/backgroundhome/">後台首頁</a>
                             <a class="dropdown-item" href="/managementlist/">權限管理</a>
                             <a class="dropdown-item" href="/listall/">會員管理</a>
-                            <a class="dropdown-item" href="#">商品管理</a>
+                            <a class="dropdown-item" href="/productcreate/">商品管理</a>
                             <a class="dropdown-item" href="/ordertable/">商品訂單</a>
                             <a class="dropdown-item" href="/inventorysheet/">庫存查詢</a>
                         </div>
@@ -82,16 +82,16 @@
             {% for order in resultList %}
         <tr>
             <td>{{ order.id }}</td>
-            <td>{{ order.customemail.Username }}</td>
-            <td>{{ order.customname }}</td>
-            <td>{{ order.customphone }}</td>
-            <td>{{ order.customemail.Usermail }}</td>
+            <td>{{ order.customer_email.username }}</td>
+            <td>{{ order.customer_name }}</td>
+            <td>{{ order.customer_phone }}</td>
+            <td>{{ order.customer_email.user_mail }}</td>
             <td>{{ order.subtotal }}</td>
             <td>{{ order.shipping }}</td>
-            <td>{{ order.grandtotal }}</td>
+            <td>{{ order.grand_total }}</td>
             <td>{{ order.shipping_method }}</td>
-            <td>{{ order.customaddress }}</td>
-            <td>{{ order.paytype }}</td>
+            <td>{{ order.customer_address }}</td>
+            <td>{{ order.pay_type }}</td>
             <td>
                 {% if order.customemail.Isblacklisted %}
                     是
@@ -198,27 +198,7 @@
             updatePageSelect();
         }
     
-        // Helper 函數來創建分頁鏈接
-        function createPageLink(page, label, content) {
-            var li = document.createElement('li');
-            li.className = 'page-item';
-            if (page === currentPage) {
-                li.classList.add('active');
-            }
-            var a = document.createElement('a');
-            a.className = 'page-link';
-            a.href = '#';
-            a.textContent = content;
-            a.setAttribute('aria-label', label);
-            a.addEventListener('click', function (e) {
-                e.preventDefault();
-                currentPage = page;
-                updatePagination();
-                updateTableVisibility();
-            });
-            li.appendChild(a);
-            return li;
-        }
+
     
         // Helper 函數來更新下拉選單的選項
         function updatePageSelect() {

@@ -1,16 +1,3 @@
-{% comment %} {% extends 'base.html' %}
-
-{% block title %}Encounter M - 首頁{% endblock %}
-
-{% block page_title %}首頁{% endblock %}
-
-{% block header_title %}創造出與眾不同的設計{% endblock %}
-
-{% block header_text %}我們專注於為您帶來最優質的設計服務，讓您的品牌脫穎而出。{% endblock %}
-
-{% block header_button %}
-<a href="#" class="btn btn-primary btn-lg">了解更多</a>
-{% endblock %} {% endcomment %}
 <!DOCTYPE html>
 <html lang="zh-tw">
 <head>
@@ -20,6 +7,29 @@
     <title>Encounter U</title>
     <link rel="stylesheet" href="{% static '/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static '/subject.css' %}">
+    <style>
+        /* 自定義CSS樣式 */
+        .breadcrumb {
+          background-color: transparent;
+          padding: 0;
+          margin-top:20px;
+          margin-bottom:20px;
+          margin-left: 50px;
+          font-size: 24px;
+        }
+    
+        .breadcrumb-item + .breadcrumb-item::before {
+          content: "/";
+        }
+        .breadcrumb-item a {
+            color: #000; /* 將文字顏色設為黑色 */
+            text-decoration: none; /* 去除底線 */
+        }
+        #surfing
+        {
+            padding-top: 10px;
+        }
+      </style>
 </head>
 <body>  
     <nav class="navbar navbar-light bg-rgb(255, 255, 235) navbar-expand-md" id="top-1">
@@ -48,7 +58,7 @@
                             <a href="/cart/">
                                 <img src="{% static '/images/car.png' %}" id="cart" />
                             </a>
-                            <p class="d-md-inline d-none">
+                            <p class="d-md-inline d-none" id="top-2">
                                 <a href="/cart/">
                                     購物車
                                 </a>
@@ -77,7 +87,8 @@
                         </div>
                     </div>
                 </p>
-            </div>     
+            </div>
+                      
         </div>
     </nav>
     <div class="container-fluid" id="logo" align="center">
@@ -170,59 +181,14 @@
             </div>
         </div>
     </nav>
-
-    <div class="carousel slide" id="myCarousel" data-bs-ride="carousel"data-bs-interval="2500"  >
-        <ol class="carousel-indicators" >
-            <li data-bs-target="#myCarousel" data-bs-slide-to="0" class="active">
-            <li data-bs-target="#myCarousel" data-bs-slide-to="1"></li>
-            <li data-bs-target="#myCarousel" data-bs-slide-to="2"></li>
-            <li data-bs-target="#myCarousel" data-bs-slide-to="3"></li>
-            <li data-bs-target="#myCarousel" data-bs-slide-to="4"></li>
+    <nav class="navbar navbar-light bg-white" aria-label="breadcrumb" id="bottom-nav">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'subject' %}">首頁</a></li>
+            <li class="breadcrumb-item"><a href="#">{{ type }}</a></li>
         </ol>
-        <div class="carousel-inner"align="center">
-            <div class="carousel-item active" >
-                <a href="/productcontent/3/">  
-                <img src="{% static 'images/' %}{{ images.21.ImageName }}" class="d-block img-fluid" alt="h1" id="float_image"/>
-                </a>
-                <div class="carousel-caption d-none d-md-block"></div>
-            </div>
-            <div class="carousel-item" >
-                <a href="/productcontent/6/">
-                    <img src="{% static 'images/' %}{{ images.45.ImageName }}" class="d-block img-fluid " alt="h2" id="float_image"/>
-                </a>
-                <div class="carousel-caption d-none d-md-block"></div>
-            </div>
-            <div class="carousel-item">
-                <a href="/productcontent/5/">
-                    <img src="{% static 'images/' %}{{ images.37.ImageName }}" class="d-block img-fluid" alt="h3" id="float_image"/>
-                </a>
-                <div class="carousel-caption d-none d-md-block"></div>
-            </div>
-            <div class="carousel-item">
-                <a href="/productcontent/4/">
-                    <img src="{% static 'images/' %}{{ images.28.ImageName }}" class="d-block img-fluid" alt="h4" id="float_image"/>
-                </a>
-                <div class="carousel-caption d-none d-md-block"></div>
-            </div>
-            <div class="carousel-item">
-                <a href="/productcontent/7/">
-                    <img src="{% static 'images/' %}{{ images.53.ImageName }}" class="d-block img-fluid" alt="h4" id="float_image"/>
-                </a>
-                <div class="carousel-caption d-none d-md-block"></div>
-            </div>
-        </div>
-            <button class="carousel-control-prev "  data-bs-target="#myCarousel"data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            </button>
-            <button class="carousel-control-next "  data-bs-target="#myCarousel"data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            </button> 
-    </div>
-    <div class="container-fluild" align="center" id="NEW">
-        <strong><p>NEW ARRIVALS 熱銷新品</p></strong>
-    </div>
+    </nav>
     <div class="row justify-content-between" id="goods">
-        {% for product in productall %}
+        {% for product in products %}
             <div class="col-12 col-md-6 col-lg-3">
                 <div class="card mt-2" id="card">
                     <div class="card-header">
@@ -249,7 +215,7 @@
             </div>
         {% endfor %}
     </div>
-    <a href="{% url 'subject' %}"  id="back"><img src="{% static './images/b.png' %}" ></a>
+    <a href="#" id="back"><img src="{% static './images/b.png' %}" ></a>
     <hr >
     <footer>
         <div class="container-fluid">
@@ -261,14 +227,13 @@
                     <a href="#"><img src="{% static './images/fb.png' %}" alt="fb"></a>&nbsp;
                     <a href="#"><img src="{% static './images/line1.png' %}" alt="line1"></a>&nbsp;
                     <a href="#"><img src="{% static './images/ig.png' %}" alt="ig"></a>&nbsp;
-                </div>
+                </div> 
                 <div class="text-center col-lg-2   d-flex  align-items-center d-md-inline d-sm-none" id="surfing">
                     <p>今日瀏覽次數: {{ daily_views }}</p>
                 </div>   
                 <div class="text-center col-lg-2 d-flex  align-items-center d-md-inline d-sm-none" id="surfing">
                     <p>累計瀏覽次數: {{ total_views }}</p>
                 </div> 
-            </div>
             </div>
         </div>
     </footer>

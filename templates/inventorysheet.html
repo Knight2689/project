@@ -4,8 +4,8 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>權限管理</title>   
-    <link rel="stylesheet" href="{% static './managementlist.css' %}">
+    <title>庫存查詢</title>   
+    <link rel="stylesheet" href="{% static './inventorysheet.css' %}">
     <link rel="stylesheet" href="{% static './css/bootstrap.min.css' %}">
 </head>
 <body>
@@ -18,13 +18,13 @@
                         {% if request.user.is_authenticated %}
                             <div>
                                 <a href="/adminlogout/" id="sign_in">
-                                    <span class="bi bi-box-arrow-right"></span>{{ user.Username }} / 登出
+                                    <img src="{% static './images/member4_0.png' %}" id="member" />{{ user.username }} / 登出
                                 </a>
                             </div>
                         {% else %}
                             <div>
                                 <a href="/adminlogin/" id="sign_in">
-                                    <span id="member" class="bi bi-person"  id="member"></span> 登入
+                                    <img src="{% static './images/member4_0.png' %}" id="member" />登入
                                 </a>
                             </div>
                         {% endif %}
@@ -35,11 +35,11 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                             <a class="dropdown-item" href="/backgroundhome/">後台首頁</a>
+                            <a class="dropdown-item" href="/managementlist/">權限管理</a>
                             <a class="dropdown-item" href="/listall/">會員管理</a>
                             <a class="dropdown-item" href="/productcreate/">商品管理</a>
                             <a class="dropdown-item" href="/orders/">收件管理</a>
                             <a class="dropdown-item" href="/ordertable/">商品訂單</a>
-                            <a class="dropdown-item" href="/inventorysheet/">庫存查詢</a>
                         </div>
                     </div>
                 </p>
@@ -48,14 +48,13 @@
     </nav>
     <div class="container">
         <div class="head_content text-center mt-3">
-            <h1 class="title">權限管理</h1>
+            <h1 class="title">庫存查詢</h1>
         </div>
     </div>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand" href="/managementcreatedata/"><button type="button" class="btn btn-success">新增權限管理</button></a>
-            <span class="navbar-text flex-grow-1 text-center">目前的資料筆數: {{ resultList.count }}</span>
-            <form class="form-inline d-flex" action="/managementlist/" method="post">
+            <span class="navbar-text flex-grow-1 text-center">目前的資料筆數: {{ product_color_size_stocks.count }}</span>
+            <form class="form-inline d-flex" action="/inventorysheet/" method="post">
                 <input class="form-control ml-auto" type="search" id="site_search" name="site_search" placeholder="🔍請輸入關鍵字" >
                 <button class="btn btn-outline-success" type="submit" id="btn_search">搜 尋</button>
                 <button class="btn btn-outline-primary" type="button" id="btn_back" onclick="history.back()">返 回</button>
@@ -66,56 +65,27 @@
     {% if status %}
         <table cellpadding="20" cellspacing="0"class="table table-striped table-hover" id="data-table">
             <tr>
-                <th>📝編號</th>
-                <th>✏️管理者帳號</th>
-                <th>✉信箱</th>
-                <th>✐姓氏</th>
-                <th>✍名字</th>
-                <th>☀超級使用者</th>
-                <th>⛑︎工作人員</th>
-                <th>✔有效</th>
-                <th>⏱︎加入時間</th>
-                <th>⏲︎最後登入</th>
-                <th>🛠️操作</th>
+                <th>🏷️分類ID</th>
+                <th>🗂️分類</th>
+                <th>📄商品名稱</th>
+                <th>💲單價</th>
+                <th>🎨顏色</th>
+                <th>📏尺寸</th>
+                <th>📦庫存</th>
             </tr>
-            {% for data in resultList %}
+            {% for order in resultList %}
+                {% for data in order.product_color_size_stocks.all %}
                 <tr>
-                    <td>{{ data.id }}</td>
-                    <td>{{ data.username }}</td>
-                    <td>{{ data.email }}</td>
-                    <td>{{ data.first_name }}</td>
-                    <td>{{ data.last_name }}</td>
-                    <td>
-                        {% if data.is_superuser %}
-                            是
-                        {% else %}
-                            否
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if data.is_staff %}
-                            是
-                        {% else %}
-                            否
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if data.is_active %}
-                            是
-                        {% else %}
-                            否
-                        {% endif %}
-                    </td>
-                    <td>{{ data.date_joined |date:'Y-m-d' }}</td>
-                    <td>{{ data.last_login |date:'Y-m-d' }}</td>
-                    
-                    <td>
-                        <a href="/managementedit/{{ data.id }}/"><button type="button" class="btn btn-outline-primary">✚編輯</button></a>
-                        <a href="/managementdelete/{{ data.id }}/"><button type="button" class="btn btn-outline-danger">✘刪除</button></a>
-                        
-                    </td>
+                    <td>{{ order.type.type_id }}</td>
+                    <td>{{ order.type.type_name }}</td>
+                    <td>{{ order.product_name }}</td>
+                    <td>{{ order.price }}</td>
+                    <td>{{ data.color.color_name }}</td>
+                    <td>{{ data.size.size_name }}</td>
+                    <td>{{ data.stock }}</td>
                 </tr>
-            {% endfor %}
+                {% endfor %}
+            {% endfor %}     
         </table>
         <nav aria-label="Page navigation example">
             <div class="d-flex justify-content-center">
@@ -151,8 +121,13 @@
         <h1>無資料</h1>
     {% endif %}
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            updateTableVisibility();
+            updatePageSelect(); // 初始化下拉选择框的选项
+            pageSelect.value = currentPage; // 设置下拉选择框的值为当前页码
+        });
         // 獲取數據總數和每頁顯示的數據量
-        var totalData = {{ resultList|length }};
+        var totalData = {{ productcolorsizestocks|length }};
         var itemsPerPage = 10; // 每頁顯示10條數據
     
         // 計算總頁數
@@ -164,55 +139,57 @@
         // 每次只顯示最多的頁碼數（這裡設為5）
         var maxVisiblePages = 5;
     
-        // 獲取分頁元素
-        var pagination = document.querySelector('.pagination');
-        var previousPage = document.getElementById('previousPage');
-        var nextPage = document.getElementById('nextPage');
-        var pageSelect = document.getElementById('pageSelect');
-    
-        // 更新分頁元素的可見性
-        function updatePagination() {
-            if (totalPages <= 1) {
-                pagination.style.display = 'none';
-            } else {
-                pagination.style.display = 'block';
-        
-                // 清空分頁元素
-                pagination.innerHTML = '';
-        
-                // 添加上一頁鏈接
-                if (currentPage > 1) {
-                    pagination.appendChild(createPageLink(currentPage - 1, 'Previous', '&laquo;'));
-                }
-        
-                // 計算要顯示的頁碼範圍
-                var startPage = Math.max(currentPage - Math.floor(maxVisiblePages / 2), 1);
-                var endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
-        
-                // 如果末尾頁碼不足 maxVisiblePages，則調整 startPage
-                if (endPage - startPage + 1 < maxVisiblePages) {
-                    startPage = Math.max(endPage - maxVisiblePages + 1, 1); // 确保 startPage 不小于1
-                }
-        
-                // 添加頁碼鏈接
-                for (var i = startPage; i <= endPage; i++) {
-                    pagination.appendChild(createPageLink(i, 'Page ' + i, i.toString()));
-                }
-        
-                // 如果當前頁在第四頁之後，並且總頁數大於四，則動態添加第四頁的鏈接
-                if (currentPage > maxVisiblePages && totalPages > maxVisiblePages) {
-                    pagination.appendChild(createPageLink(maxVisiblePages, 'Page ' + maxVisiblePages, maxVisiblePages.toString()));
-                }
-        
-                // 添加下一頁鏈接
-                if (currentPage < totalPages) {
-                    pagination.appendChild(createPageLink(currentPage + 1, 'Next', '&raquo;'));
-                }
+// 獲取分頁元素
+var pagination = document.querySelector('.pagination');
+var previousPage = document.getElementById('previousPage');
+var nextPage = document.getElementById('nextPage');
+var pageSelect; // 將pageSelect定義為全局變量
+
+// 更新分頁元素的可見性
+function updatePagination() {
+    // 重新獲取pageSelect元素
+    pageSelect = document.getElementById('pageSelect');
+    // 確認pageSelect存在後再執行後續操作
+    if (pageSelect) {
+        if (totalPages <= 1) {
+            pagination.style.display = 'none';
+        } else {
+            pagination.style.display = 'block';
+
+            // 清空分頁元素
+            pagination.innerHTML = '';
+
+            // 添加上一頁鏈接
+            if (currentPage > 1) {
+                pagination.appendChild(createPageLink(currentPage - 1, 'Previous', '&laquo;'));
             }
-        
-            // 更新下拉選單的選項
-            updatePageSelect();
+
+            // 計算要顯示的頁碼範圍
+            var startPage = Math.max(currentPage - Math.floor(maxVisiblePages / 2), 1);
+            var endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+
+            // 如果末尾頁碼不足 maxVisiblePages，則調整 startPage
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+            }
+
+            // 添加頁碼鏈接
+            for (var i = startPage; i <= endPage; i++) {
+                pagination.appendChild(createPageLink(i, 'Page ' + i, i.toString()));
+            }
+
+            // 添加下一頁鏈接
+            if (currentPage < totalPages) {
+                pagination.appendChild(createPageLink(currentPage + 1, 'Next', '&raquo;'));
+            }
         }
+
+        // 更新下拉選單的選項
+        updatePageSelect();
+    } else {
+        console.error("pageSelect 元素未找到！");
+    }
+}
     
         // Helper 函數來創建分頁鏈接
         function createPageLink(page, label, content) {
@@ -285,7 +262,7 @@
     
             var tableRows = document.querySelectorAll('#data-table tr');
             tableRows.forEach(function (row, index) {
-                if (index === 0 || (index >= startIndex + 1 && index <= endIndex)) {
+                if (index < 2 || (index >= startIndex + 1 && index <= endIndex)) {
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
@@ -293,6 +270,8 @@
             });
         }
     
+
+
         // 初始化分頁
         updatePagination();
         updateTableVisibility();

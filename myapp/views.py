@@ -17,8 +17,85 @@ from .models import *
 from django.utils import timezone
 from django.db.models import Sum
 from django.http import JsonResponse
-from .models import ProductTypeModel, ColorModel, SizeModel
+from .models import ProductTypeModel, ColorModel, SizeModel, ImageModel ,Products, ProductColorSizeStockModel
 from django.db.models import Q
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+def get_product_types(request):
+    # 查詢資料庫取得所有的產品分類信息
+    product_types = ProductTypeModel.objects.all()
+    
+    # 將查詢結果序列化為字典列表
+    serialized_product_types = [{'id': type.type_id, 'name': type.type_name} for type in product_types]
+    
+    # 傳回 JSON 格式的數據
+    return JsonResponse(serialized_product_types, safe=False)
+
+def get_product_colors(request):
+    # 查詢資料庫取得所有的產品分類信息
+    product_colors = ColorModel.objects.all()
+    
+    # 將查詢結果序列化為字典列表
+    serialized_product_colors = [{'id': type.color_id, 'name': type.color_name} for type in product_colors]
+    
+    # 傳回 JSON 格式的數據
+    return JsonResponse(serialized_product_colors, safe=False)
+
+def get_product_sizes(request):
+    # 查詢資料庫取得所有的產品分類信息
+    product_sizes = SizeModel.objects.all()
+    
+    # 將查詢結果序列化為字典列表
+    serialized_product_sizes = [{'id': type.size_id, 'name': type.size_name} for type in product_sizes]
+    
+    # 傳回 JSON 格式的數據
+    return JsonResponse(serialized_product_sizes, safe=False)
+
+# 创建一个信号量，用于在 Products 模型保存后更新 ProductColorSizeStockModel 记录
+@receiver(post_save, sender=Products)
+def update_product_color_size_stock(sender, instance, **kwargs):
+    # 检查信号量是否为创建新记录，而不是更新现有记录
+    if kwargs['created']:
+        # 如果是创建新记录，则创建相应的 ProductColorSizeStockModel 记录
+        product_color_size_stock = ProductColorSizeStockModel.objects.create(
+            product=instance,
+            color=instance.color,
+            size=instance.size,
+            stock=instance.stock
+        )
+    else:
+        # 如果是更新现有记录，则更新相应的 ProductColorSizeStockModel 记录
+        product_color_size_stock = ProductColorSizeStockModel.objects.get(product=instance)
+        product_color_size_stock.stock = instance.stock
+        product_color_size_stock.save()
+
+# 添加新分类的视图
+@csrf_exempt
+def add_product_type(request):
+    if request.method == 'POST':
+        type_name = request.POST.get('type_name')
+        new_type = ProductTypeModel.objects.create(type_name=type_name)
+        return JsonResponse({'type_id': new_type.type_id, 'type_name': new_type.type_name})
+    return JsonResponse({'error': 'Invalid request method'})
+
+# 添加新颜色的视图
+@csrf_exempt
+def add_product_color(request):
+    if request.method == 'POST':
+        color_name = request.POST.get('color_name')
+        new_color = ColorModel.objects.create(color_name=color_name)
+        return JsonResponse({'color_id': new_color.color_id, 'color_name': new_color.color_name})
+    return JsonResponse({'error': 'Invalid request method'})
+
+# 添加新尺寸的视图
+@csrf_exempt
+def add_product_size(request):
+    if request.method == 'POST':
+        size_name = request.POST.get('size_name')
+        new_size = SizeModel.objects.create(size_name=size_name)
+        return JsonResponse({'size_id': new_size.size_id, 'size_name': new_size.size_name})
+    return JsonResponse({'error': 'Invalid request method'})
 
 
 
@@ -51,39 +128,6 @@ def adduser(request):  #新增管理者
 		user.is_staff=True	# 工作人員狀態
 		user.save()
 		return redirect('/admin/')
-
-@csrf_exempt
-def product_create(request):
-    if request.method == "POST":
-        product_name = request.POST.get("product_name", None)
-        price = request.POST.get("price", 0)
-        type_id = request.POST.get("type_id", None)
-        color_id = request.POST.get("color_id", None)
-        size_id = request.POST.get("size_id", None)
-        stock = request.POST.get("stock", 0)
-        # Assuming you have a file input in your form for uploading images
-        image = request.FILES.get("image", None)
-        
-        new_product = Products.objects.create(
-            ProductName=product_name,
-            Price=price,
-            Type_id=type_id,
-            Color_id=color_id,
-            Size_id=size_id,
-            Stock=stock,
-            Image=image
-        )
-        
-        # 可以在這裡根據需要執行其他邏輯，例如發送通知或執行其他處理。
-
-        return redirect('/backgroundhome/')  # Redirect to the appropriate URL for viewing products
-    
-    else:
-        product_types = ProductTypeModel.objects.all()
-        colors = ColorModel.objects.all()
-        sizes = SizeModel.objects.all()
-        return render(request, "product_create.html", {'product_types': product_types, 'colors': colors, 'sizes': sizes})
-
 
 
 @csrf_exempt
@@ -258,7 +302,7 @@ def createdata(request):  #新增會員管理
         Passwd = request.POST.get("pass-wd",None)
         Useraddress= request.POST.get("user-address",None)
         Isblacklisted= int(request.POST.get("Isblacklisted", 0))
-        add = registered_user(Username=Username,Usersex=Usersex,Userbirthday=Userbirthday,Usertel=Usertel,Usermail=Usermail,Passwd=Passwd,Useraddress=Useraddress,Isblacklisted=Isblacklisted)
+        add = registered_user(username=Username,user_sex=Usersex,user_birthday=Userbirthday,user_tel=Usertel,user_mail=Usermail,password=Passwd,user_address=Useraddress,is_blacklisted=Isblacklisted)
         add.save()
         return redirect("/listall/")
         # return HttpResponse("Hello World")
@@ -278,14 +322,14 @@ def edit(request, id=None):  #編輯會員管理
         Isblacklisted= int(request.POST.get("Isblacklisted", 0))
 
         update = registered_user.objects.get(id=id)
-        update.Username = Username
-        update.Usersex = Usersex
-        update.Passwd = Passwd
-        update.Userbirthday = Userbirthday
-        update.Usermail = Usermail
-        update.Usertel = Usertel
-        update.Useraddress = Useraddress
-        update.Isblacklisted = Isblacklisted
+        update.username = Username
+        update.user_sex = Usersex
+        update.password = Passwd
+        update.user_birthday = Userbirthday
+        update.user_mail = Usermail
+        update.user_tel = Usertel
+        update.user_address = Useraddress
+        update.is_blacklisted = Isblacklisted
         update.save()
         return redirect('/listall/')
     
@@ -319,20 +363,20 @@ def orders(request):  # 收件管理
                 print('keyword=', keyword)
                 
                 if keyword == "是":
-                    q_objects.add(Q(customemail__Isblacklisted=1), Q.OR)
+                    q_objects.add(Q(customer_email__Isblacklisted=1), Q.OR)
                 elif keyword == "否":
-                    q_objects.add(Q(customemail__Isblacklisted=0), Q.OR)
+                    q_objects.add(Q(customer_email__Isblacklisted=0), Q.OR)
                 q_objects.add(Q(id__contains=keyword),Q.OR)
-                q_objects.add(Q(customemail__Username__contains=keyword),Q.OR)
-                q_objects.add(Q(customemail__Usermail__contains=keyword),Q.OR)
-                q_objects.add(Q(customname__contains=keyword),Q.OR)
-                q_objects.add(Q(customphone__contains=keyword),Q.OR)
+                q_objects.add(Q(customer_email__Username__contains=keyword),Q.OR)
+                q_objects.add(Q(customer_email__Usermail__contains=keyword),Q.OR)
+                q_objects.add(Q(customer_name__contains=keyword),Q.OR)
+                q_objects.add(Q(customer_phone__contains=keyword),Q.OR)
                 q_objects.add(Q(shipping_method__contains=keyword),Q.OR)
-                q_objects.add(Q(customaddress__contains=keyword),Q.OR)
-                q_objects.add(Q(paytype__contains=keyword),Q.OR)
+                q_objects.add(Q(customer_address__contains=keyword),Q.OR)
+                q_objects.add(Q(pay_type__contains=keyword),Q.OR)
                 q_objects.add(Q(subtotal__contains=keyword),Q.OR)
                 q_objects.add(Q(shipping__contains=keyword),Q.OR)
-                q_objects.add(Q(grandtotal__contains=keyword),Q.OR)
+                q_objects.add(Q(grand_total__contains=keyword),Q.OR)
         resultList = OrdersModel.objects.filter(q_objects)
         
     else:
@@ -359,13 +403,13 @@ def ordersedit(request, id=None):  #編輯收件管理
         customaddress = request.POST.get("customaddress",None)
         paytype = request.POST.get("paytype",None)
         update = OrdersModel.objects.get(id=id)
-        update.customname = customname
-        update.customphone = customphone
+        update.customer_name = customname
+        update.customer_phone = customphone
         update.subtotal = subtotal
-        update.grandtotal = grandtotal
+        update.grand_total = grandtotal
         update.shipping_method = shipping_method
-        update.customaddress = customaddress
-        update.paytype = paytype
+        update.customer_address = customaddress
+        update.pay_type = paytype
         update.save()
         return redirect('/orders/')
     
@@ -382,6 +426,157 @@ def ordersdelete(request, id=None):  #刪除收件管理
     else:
         dict_data = OrdersModel.objects.get(id=id)
         return render(request,"ordersdelete.html",locals())   
+    
+@csrf_exempt
+def ordertable(request):  #商品訂單
+    if 'site_search' in request.POST:
+        site_search = request.POST["site_search"]
+        site_search = site_search.strip() #去空白
+        keywords = site_search.split(" ")#字元切割
+        q_objects = Q()
+        for keyword in keywords:
+            if keyword != "":
+                status = True
+                q_objects.add(Q(dorder__id__contains=keyword), Q.OR)
+                q_objects.add(Q(product_name__contains=keyword), Q.OR)
+                q_objects.add(Q(color__contains=keyword), Q.OR)
+                q_objects.add(Q(size__contains=keyword), Q.OR)
+                q_objects.add(Q(unit_price__contains=keyword), Q.OR)
+                q_objects.add(Q(quantity__contains=keyword), Q.OR)
+                q_objects.add(Q(total__contains=keyword), Q.OR)
+            resultList = DetailModel.objects.filter(q_objects)
+    else:    
+        resultList = DetailModel.objects.all().order_by('dorder_id')
+        print('resultList=',resultList)
+    if not resultList:
+        errormessage = "無資料"
+        status = False
+    else:
+        errormessage = ""
+        status = True
+    return render(request,"ordertable.html",locals())  
+
+@csrf_exempt#商品新增
+def productcreate(request):
+    if request.method == "POST":
+        product_name = request.POST.get("product_name", None)
+        price = request.POST.get("product_price", 0)
+        type_id = request.POST.get("type_id", None)
+        color_id = request.POST.get("color_id", None)
+        size_id = request.POST.get("size_id", None)
+        stock = request.POST.get("stock", 0)
+        image = request.FILES.get("image_file", None)  # 获取上传的图像文件
+
+        print("Product Name:", product_name)
+        print("Price:", price)
+        print("Type ID:", type_id)
+        print("Color ID:", color_id)
+        print("Size ID:", size_id)
+        print("Stock:", stock)
+        print("Image:", image)
+
+        # 處理圖像上傳
+        new_image = None
+        if image:
+            # 將圖像儲存到資料庫中，假設 ImageModel 模型中有一個名為 name 的欄位來保存圖像的名稱
+            new_image = ImageModel.objects.create(name=product_name, image=image)
+            print("Image uploaded successfully. Image ID:", new_image.id)
+
+        # 建立產品實例，並將影像關聯到產品中
+        add = Products(product_name=product_name, price=price, type_id=type_id, color_id=color_id, size_id=size_id, stock=stock)
+        add.save()
+
+        # 將圖像關聯到產品
+        if new_image:
+            add.image = new_image
+            add.save()
+
+        return JsonResponse({'message': '商品新增成功'})  # 返回成功信息
+    else:
+        product_types = ProductTypeModel.objects.all()
+        colors = ColorModel.objects.all()
+        sizes = SizeModel.objects.all()
+        return render(request, "productcreate.html", locals())
+
+@csrf_exempt
+def get_image(request, image_id):
+    try:
+        image = ImageModel.objects.get(image_id=image_id)
+        # 返回圖片路徑或其他相關數據，這取決於您的需求
+        return JsonResponse({'image_url': image.image.url})
+    except ImageModel.DoesNotExist:
+        return JsonResponse({'error': 'Image not found'}, status=404)
+
+
+@csrf_exempt
+def ordertableedit(request, id=None):  #編輯商品訂單
+    if request.method == "POST":
+        dname = request.POST.get("product_name", None)
+        dcolor = request.POST.get("color",None)
+        dsize = request.POST.get("size",None)
+        dunitprice = request.POST.get("unit_price",0)
+        dquantity = request.POST.get("quantity",0)
+        dtotal = request.POST.get("total",0)
+        update = DetailModel.objects.get(id=id)
+        update.product_name = dname
+        update.color = dcolor
+        update.size = dsize
+        update.unit_price = dunitprice
+        update.quantity = dquantity
+        update.total = dtotal
+        update.save()
+        return redirect('/ordertable/')
+    
+    else:
+        update = DetailModel.objects.get(id=id)
+        return render(request,"ordertableedit.html",locals()) 
+
+
+@csrf_exempt    
+def ordertabledelete(request, id=None):  #刪除商品訂單
+    if request.method == "POST":
+        data = DetailModel.objects.get(id=id)
+        data.delete()
+        return redirect("/ordertable/")
+    else:
+        dict_data = DetailModel.objects.get(id=id)
+        return render(request,"ordertabledelete.html",locals())   
+
+@csrf_exempt
+def inventorysheet(request):  #庫存查詢
+    if 'site_search' in request.POST:
+        site_search = request.POST["site_search"]
+        site_search = site_search.strip() #去空白
+        keywords = site_search.split(" ")#字元切割
+        q_objects = Q()
+        color_filter = Q()
+        for keyword in keywords:
+            if keyword != "":
+                status = True
+                q_objects.add(Q(type__type_id__contains=keyword), Q.OR)
+                q_objects.add(Q(type__type_name__contains=keyword), Q.OR)
+                q_objects.add(Q(product_name__contains=keyword), Q.OR)
+                q_objects.add(Q(price__contains=keyword), Q.OR)
+                q_objects.add(Q(product_color_size_stocks__color__color_name__contains=keyword), Q.OR)
+                q_objects.add(Q(product_color_size_stocks__size__size_name__contains=keyword), Q.OR)
+                q_objects.add(Q(product_color_size_stocks__stock__contains=keyword), Q.OR)
+            
+            resultList = Products.objects.prefetch_related('product_color_size_stocks', 'product_color_size_stocks__color', 'product_color_size_stocks__size').filter(q_objects)
+            product_color_size_stocks = ProductColorSizeStockModel.objects.all()
+    else:   
+        resultList = Products.objects.prefetch_related('product_color_size_stocks', 'product_color_size_stocks__color', 'product_color_size_stocks__size').all().order_by('type')
+        print('resultList=',resultList)
+        product_color_size_stocks = ProductColorSizeStockModel.objects.all()
+
+    if resultList:  # 如果 resultList 不為空，則設置 status 為 True
+        status = True
+    if not resultList:
+        errormessage = "無資料"
+        status = False
+    else:
+        errormessage = ""
+        status = True
+    return render(request,"inventorysheet.html",locals())     
 
 
 #使用者
@@ -431,16 +626,16 @@ def ordertable(request):  #商品訂單
         for keyword in keywords:
             if keyword != "":
                 status = True
-                q_objects.add(Q(dorder__id__contains=keyword), Q.OR)
-                q_objects.add(Q(dname__contains=keyword), Q.OR)
-                q_objects.add(Q(dcolor__contains=keyword), Q.OR)
-                q_objects.add(Q(dsize__contains=keyword), Q.OR)
-                q_objects.add(Q(dunitprice__contains=keyword), Q.OR)
-                q_objects.add(Q(dquantity__contains=keyword), Q.OR)
-                q_objects.add(Q(dtotal__contains=keyword), Q.OR)
+                q_objects.add(Q(order__id__contains=keyword), Q.OR)
+                q_objects.add(Q(product_name__contains=keyword), Q.OR)
+                q_objects.add(Q(color__contains=keyword), Q.OR)
+                q_objects.add(Q(size__contains=keyword), Q.OR)
+                q_objects.add(Q(unit_price__contains=keyword), Q.OR)
+                q_objects.add(Q(quantity__contains=keyword), Q.OR)
+                q_objects.add(Q(total__contains=keyword), Q.OR)
             resultList = DetailModel.objects.filter(q_objects)
     else:    
-        resultList = DetailModel.objects.all().order_by('dorder_id')
+        resultList = DetailModel.objects.all().order_by('order_id')
         print('resultList=',resultList)
     if not resultList:
         errormessage = "無資料"
@@ -449,6 +644,7 @@ def ordertable(request):  #商品訂單
         errormessage = ""
         status = True
     return render(request,"ordertable.html",locals())  
+
 
 @csrf_exempt
 def ordertableedit(request, id=None):  #編輯商品訂單
@@ -778,3 +974,52 @@ def classification(request, type=None):  #分類頁面
         products = products.filter(Type_id__TypeName='特價商品') 
    
     return render(request, "classification.html", locals())
+
+@csrf_exempt     
+def productcontent(request,productid=None):  #商品資訊
+    user_id = request.session.get('user_id')
+    if user_id:
+        user = registered_user.objects.get(id=user_id)
+    productall = Products.objects.all()
+    product = Products.objects.get(ProductID=productid)  #取得商品
+    images = ImageModel.objects.filter(Product_id=product)
+    description = DescriptionModel.objects.get(Product_id=product)
+    color_set = set()  # 創建一個空集合來儲存唯一的顏色
+    unique_colors = []  # 創建一個空列表來儲存唯一的顏色
+    size_set = set()  # 創建一個空集合來儲存唯一的尺寸
+    unique_sizes = []  # 創建一個空列表來儲存唯一的尺寸
+    stocks = ProductColorSizeStockModel.objects.filter(Product_id=product)
+    for stock in stocks:
+        color_name = stock.Color_id.ColorName
+        size_name = stock.Size_id.SizeName
+        if color_name not in color_set:
+        # 如果顏色名稱不在集合中，將其添加到集合和唯一顏色列表
+            color_set.add(color_name)
+            unique_colors.append(color_name)
+        if size_name not in size_set:
+        # 如果尺寸名稱不在集合中，將其添加到集合和唯一尺寸列表
+            size_set.add(size_name)
+            unique_sizes.append(size_name)
+    page_name = 'subject'  # 頁面名稱
+
+    # 查找或創建 PageView
+    page, created = PageView.objects.get_or_create(page_name=page_name, date=datetime.date.today())
+
+    page.total_views = PageView.objects.aggregate(Sum('daily_views'))['daily_views__sum'] or 0
+
+    # 增加瀏覽次數
+    page.daily_views += 1
+    page.total_views += 1
+    page.save()
+
+    # 從 PageView 對象中獲取累計和當日瀏覽次數
+    total_views = page.total_views
+    daily_views = page.daily_views
+
+    tomorrow = timezone.now() + timezone.timedelta(days=1)
+    tomorrow = timezone.datetime.replace(tomorrow, hour=0, minute=0, second=0)
+    expires = timezone.datetime.strftime(tomorrow, "%a, %d-%b-%Y %H:%M:%S GMT")
+    response = render(request, "subject.html", {"total_views": total_views, "daily_views": daily_views})
+    response.set_cookie("total_views", str(total_views), expires=expires)
+
+    return render(request, "productcontent.html", locals())

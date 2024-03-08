@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增資料</title>   
+    <link rel="stylesheet" href="{% static './createdata.css' %}">
+    <link rel="stylesheet" href="{% static './css/bootstrap.min.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light" >
+    <div class="container">
+        <h1 class="title mx-auto"><b>會員管理-新增資料</b></h1>
+        <a href="/listall/" class="navbar-brand" style="margin-right: 20px;"><h4><b>返回</b></h4></a>
+    </div>
+</nav>
+<div class="container">
+    <form id="upload-form" action="/productcreate/" method="POST" enctype="multipart/form-data" class="table">
+        {% csrf_token %}
+        <table class="table table-bordered">
+            <tr id="tabletop">
+                <th>欄位</th>
+                <th>會員資訊</th>
+            </tr>
+            <tr>
+                <th><span>*</span>商品名稱</th>
+                <td><input type="text" id="product_name" name="product_name" class="form-control" required placeholder="請輸入商品名稱"></td>
+            </tr>
+            <tr>
+                <th><span>*</span>價格</th>
+                <td><input type="text" id="product_price" name="product_price" class="form-control" required placeholder="請輸入價格"></td>
+            </tr>
+            <tr>
+                <th><span>*</span>商品分類</th>
+                <td>
+                    <div class="input-group">
+                        <select id="type_id" name="type_id" class="form-control" required>
+                            <option value="">選擇分類</option>
+                        </select>
+                        <div class="input-group-append">
+                            <form id="add-type-form">
+                                {% csrf_token %}
+                                <input type="text" id="new_type_name" name="type_name" class="form-control" placeholder="輸入新的分類名稱">
+                                <button type="button" id="add_type_btn" class="btn btn-primary">添加</button>
+                            </form>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th><span>*</span>顏色</th>
+                <td>
+                    <select id="color_id" name="color_id" class="form-control" required>
+                        <option value="">選擇顏色</option>
+                        <!-- 这里是初始的选项，会在 JavaScript 中被替换 -->
+                    </select>
+                    <form id="add-color-form">
+                        {% csrf_token %}
+                        <input type="text" id="new_color_name" name="color_name" class="form-control" placeholder="輸入新的顏色名稱">
+                        <button type="button" id="add_color_btn">添加</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <th><span>*</span>尺寸</th>
+                <td>
+                    <select id="size_id" name="size_id" class="form-control" required>
+                        <option value="">選擇尺寸</option>
+                    </select>
+                    <form id="add-size-form">
+                        {% csrf_token %}
+                        <input type="text" id="new_size_name" name="size_name" class="form-control" placeholder="輸入新的尺寸名稱">
+                        <button type="button" id="add_size_btn">添加</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <th><span>*</span>庫存</th>
+                <td><input type="text" id="stock" name="stock" class="form-control" required placeholder="請輸入庫存"></td>
+            </tr>
+            <tr>
+                <th><span>*</span>商品圖片</th>
+                <td><input type="file" id="image_file" name="image_file" accept="image/*"></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center;">
+                    <button type="submit" class="btn btn-primary btn-lg custom-margin" name="button" id="button">儲存</button>
+                    <button type="reset" class="btn btn-danger btn-lg" name="button2" id="button2">清除</button>
+                </td>
+            </tr>
+            
+        </table>
+    </form>
+</div>
+<script>
+    // 當頁面載入完成後執行
+    $(document).ready(function() {
+        // 向後端 API 發送 GET 請求以獲取產品分類資訊
+        $.ajax({
+            url: '/api/product-types/',
+            type: 'GET',
+            success: function(data) {
+                // 循環遍歷返回的數據，並將每個分類添加到下拉式選單中
+                data.forEach(function(category) {
+                    $('#type_id').append($('<option>', {
+                        value: category.id,
+                        text: category.name
+                    }));
+                });
+            },
+            error: function(xhr, textStatus, error) {
+                console.log(xhr.statusText);
+            }
+        });
+ 
+
+        // 向後端 API 發送 GET 請求以獲取產品分類資訊
+        $.ajax({
+            url: '/api/product-colors/',
+            type: 'GET',
+            success: function(data) {
+                // 循環遍歷返回的數據，並將每個分類添加到下拉式選單中
+                data.forEach(function(category) {
+                    $('#color_id').append($('<option>', {
+                        value: category.id,
+                        text: category.name
+                    }));
+                });
+            },
+            error: function(xhr, textStatus, error) {
+                console.log(xhr.statusText);
+            }
+        });
+   
+
+        // 向後端 API 發送 GET 請求以獲取產品分類資訊
+        $.ajax({
+            url: '/api/product-sizes/',
+            type: 'GET',
+            success: function(data) {
+                // 循環遍歷返回的數據，並將每個分類添加到下拉式選單中
+                data.forEach(function(category) {
+                    $('#size_id').append($('<option>', {
+                        value: category.id,
+                        text: category.name
+                    }));
+                });
+            },
+            error: function(xhr, textStatus, error) {
+                console.log(xhr.statusText);
+            }
+        });
+    });
+
+
+    $(document).ready(function() {
+        // 当表单提交时执行
+        $('#upload-form').submit(function(event) {
+            // 防止表单默认提交行为
+            event.preventDefault();
+            
+            // 创建一个FormData对象
+            var formData = new FormData(this);
+            
+            // 将文件字段命名为'image'
+            formData.set('image', $('#image_file')[0].files[0]);
+            
+            // 添加产品信息到FormData对象
+            formData.append('product_name', $('#product_name').val());
+            formData.append('product_price', $('#product_price').val());
+            formData.append('type_id', $('#type_id').val());
+            formData.append('color_id', $('#color_id').val());
+            formData.append('size_id', $('#size_id').val());
+            formData.append('stock', $('#stock').val());
+            
+            // 使用AJAX向后端发送POST请求，包含FormData对象
+            $.ajax({
+                url: $(this).attr('action'), // 使用表单的action属性作为URL
+                type: 'POST',
+                data: formData,
+                processData: false,  // 不处理数据
+                contentType: false,  // 不设置内容类型
+                success: function(response) {
+                    // 处理成功响应
+                    console.log(response);
+                },
+                error: function(xhr, textStatus, error) {
+                    // 处理错误响应
+                    console.log(xhr.statusText);
+                }
+            });
+        });
+    });
+    
+    $(document).ready(function() {
+        // 添加新分类
+        $('#add_type_btn').click(function() {
+            var newTypeName = $('#new_type_name').val();
+            $.ajax({
+                url: '/api/add-product-type/',
+                type: 'POST',
+                data: {type_name: newTypeName},
+                success: function(response) {
+                    // 清空输入框
+                    $('#new_type_name').val('');
+                    // 添加新选项到下拉菜单
+                    $('#type_id').append($('<option>', {
+                        value: response.type_id,
+                        text: response.type_name
+                    }));
+                },
+                error: function(xhr, textStatus, error) {
+                    console.log(xhr.statusText);
+                }
+            });
+        });
+    
+        // 添加新颜色
+        $('#add_color_btn').click(function() {
+            var newColorName = $('#new_color_name').val();
+            $.ajax({
+                url: '/api/add-product-color/',
+                type: 'POST',
+                data: {color_name: newColorName},
+                success: function(response) {
+                    // 清空输入框
+                    $('#new_color_name').val('');
+                    // 添加新选项到下拉菜单
+                    $('#color_id').append($('<option>', {
+                        value: response.color_id,
+                        text: response.color_name
+                    }));
+                },
+                error: function(xhr, textStatus, error) {
+                    console.log(xhr.statusText);
+                }
+            });
+        });
+    
+        // 添加新尺寸
+        $('#add_size_btn').click(function() {
+            var newSizeName = $('#new_size_name').val();
+            $.ajax({
+                url: '/api/add-product-size/',
+                type: 'POST',
+                data: {size_name: newSizeName},
+                success: function(response) {
+                    // 清空输入框
+                    $('#new_size_name').val('');
+                    // 添加新选项到下拉菜单
+                    $('#size_id').append($('<option>', {
+                        value: response.size_id,
+                        text: response.size_name
+                    }));
+                },
+                error: function(xhr, textStatus, error) {
+                    console.log(xhr.statusText);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -37,7 +37,7 @@
                             <a class="dropdown-item" href="/backgroundhome/">後台首頁</a>
                             <a class="dropdown-item" href="/managementlist/">權限管理</a>
                             <a class="dropdown-item" href="/listall/">會員管理</a>
-                            <a class="dropdown-item" href="#">商品管理</a>
+                            <a class="dropdown-item" href="/productcreate/">商品管理</a>
                             <a class="dropdown-item" href="/orders/">收件管理</a>
                             <a class="dropdown-item" href="/inventorysheet/">庫存查詢</a>
                         </div>
@@ -76,13 +76,13 @@
             </tr>
             {% for order in resultList %}
         <tr>
-            <td>{{ order.dorder_id }}</td>
-            <td>{{ order.dname }}</td>
-            <td>{{ order.dcolor }}</td>
-            <td>{{ order.dsize }}</td>
-            <td>{{ order.dunitprice }}</td>
-            <td>{{ order.dquantity }}</td>
-            <td>{{ order.dtotal }}</td>
+            <td>{{ order.order_id }}</td>
+            <td>{{ order.product_name }}</td>
+            <td>{{ order.color }}</td>
+            <td>{{ order.size }}</td>
+            <td>{{ order.unit_price }}</td>
+            <td>{{ order.quantity }}</td>
+            <td>{{ order.total }}</td>
             <td>
                 <a href="/ordertableedit/{{ order.id }}/"><button type="button" class="btn btn-outline-primary">✚編輯</button></a>
                 <a href="/ordertabledelete/{{ order.id }}/"><button type="button" class="btn btn-outline-danger">✘刪除</button></a>

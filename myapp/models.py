@@ -1,103 +1,166 @@
 from django.db import models
 import datetime
 
+# 網頁瀏覽量模型
 class PageView(models.Model):
-    page_name = models.CharField(max_length=255)  #頁面名稱
-    total_views = models.IntegerField(default=0)  # 累計瀏覽次數
-    date = models.DateField(default=datetime.date.today)  # 日期
-    daily_views = models.IntegerField(default=0)  # 當日瀏覽次數
+    # 頁面名稱
+    page_name = models.CharField(max_length=255)
+    # 累計瀏覽次數
+    total_views = models.IntegerField(default=0)
+    # 日期
+    date = models.DateField(default=datetime.date.today)
+    # 當日瀏覽次數
+    daily_views = models.IntegerField(default=0)
 
+# 註冊用戶模型
 class registered_user(models.Model):
-    Username = models.CharField(max_length=20, null=False) #會員姓名
-    Usersex = models.CharField(max_length=2, default='M', null=False) #會員性別
-    Passwd = models.CharField(max_length=128, null=False) #會員密碼
-    Userbirthday = models.DateField(null=False) #會員生日
-    Usermail = models.EmailField(max_length=100, blank=True, default='') #會員信箱
-    Usertel = models.CharField(max_length=50, blank=True, default='') #會員手機
-    Useraddress = models.CharField(max_length=255,blank=True, default='') #會員地址
-    Isblacklisted = models.BooleanField(default=False)  # 黑名單欄位
+    # 會員姓名
+    username = models.CharField(max_length=20, null=False)
+    # 會員性別
+    user_sex = models.CharField(max_length=2, default='M', null=False)
+    # 會員密碼
+    password = models.CharField(max_length=128, null=False)
+    # 會員生日
+    user_birthday = models.DateField(null=False)
+    # 會員信箱
+    user_mail = models.EmailField(max_length=100, blank=True, default='')
+    # 會員手機
+    user_tel = models.CharField(max_length=50, blank=True, default='')
+    # 會員地址
+    user_address = models.CharField(max_length=255, blank=True, default='')
+    # 黑名單欄位
+    is_blacklisted = models.BooleanField(default=False)
 
+# 訂單模型
 class OrdersModel(models.Model):
-    subtotal = models.IntegerField(default=0) #購物金額
-    shipping = models.IntegerField(default=0) #運費
-    grandtotal = models.IntegerField(default=0) #購物總金額
-    customname =  models.CharField(max_length=100, default='') #購買者姓名
-    customemail = models.ForeignKey('registered_user', on_delete=models.CASCADE, related_name='orders') #購買者信箱
-    customaddress =  models.CharField(max_length=100, default='') #購買者地址
-    customphone =  models.CharField(max_length=100, default='') #購買者手機
-    shipping_method = models.CharField(max_length=50, default='') #寄送方式
-    paytype =  models.CharField(max_length=50, default='') #付款方式
+    # 購物金額
+    subtotal = models.IntegerField(default=0)
+    # 運費
+    shipping = models.IntegerField(default=0)
+    # 購物總金額
+    grand_total = models.IntegerField(default=0)
+    # 購買者姓名
+    customer_name = models.CharField(max_length=100, default='')
+    # 購買者信箱
+    customer_email = models.ForeignKey('registered_user', on_delete=models.CASCADE, related_name='orders')
+    # 購買者地址
+    customer_address = models.CharField(max_length=100, default='')
+    # 購買者手機
+    customer_phone = models.CharField(max_length=100, default='')
+    # 寄送方式
+    shipping_method = models.CharField(max_length=50, default='')
+    # 付款方式
+    pay_type = models.CharField(max_length=50, default='')
 
+# 訂單詳情模型
 class DetailModel(models.Model):
-    dorder = models.ForeignKey('OrdersModel', on_delete=models.CASCADE) #訂單
-    dname = models.ForeignKey('Products', on_delete=models.CASCADE) #商品名稱
-    dcolor = models.ForeignKey('ColorModel', on_delete=models.CASCADE)  # 顏色
-    dsize = models.ForeignKey('SizeModel', on_delete=models.CASCADE)   # 尺寸
-    dunitprice = models.IntegerField(default=0) #商品單價
-    dquantity = models.IntegerField(default=0) #商品數量
-    dtotal = models.IntegerField(default=0) #商品總價
+    # 訂單
+    order = models.ForeignKey('OrdersModel', on_delete=models.CASCADE)
+    # 商品名稱
+    product_name = models.ForeignKey('Products', on_delete=models.CASCADE)
+    # 顏色
+    color = models.ForeignKey('ColorModel', on_delete=models.CASCADE)
+    # 尺寸
+    size = models.ForeignKey('SizeModel', on_delete=models.CASCADE)
+    # 商品單價
+    unit_price = models.IntegerField(default=0)
+    # 商品數量
+    quantity = models.IntegerField(default=0)
+    # 商品總價
+    total = models.IntegerField(default=0)
 
+# 商品模型
 class Products(models.Model):
-    dorder = models.ForeignKey('OrdersModel', on_delete=models.CASCADE) #訂單
-    ProductID = models.AutoField(primary_key=True, verbose_name='商品ID')
-    ProductName = models.CharField(max_length=100, verbose_name='商品名稱' , default='')
-    Price = models.IntegerField(default=0, verbose_name='價格') 
-    Type = models.ForeignKey('ProductTypeModel', on_delete=models.CASCADE, verbose_name='商品分類',default='')
-    Color = models.ForeignKey('ColorModel', on_delete=models.CASCADE, verbose_name='顏色',default='')
-    Size = models.ForeignKey('SizeModel', on_delete=models.CASCADE, verbose_name='尺寸',default='')
-    Stock = models.PositiveIntegerField(default=0, verbose_name='庫存')
-    Image = models.ImageField(upload_to='products/', verbose_name='商品圖片',default='')  # 圖片上傳字段
+    # 商品ID
+    product_id = models.AutoField(primary_key=True, verbose_name='商品ID')
+    # 商品名稱
+    product_name = models.CharField(max_length=100, verbose_name='商品名稱', default='')
+    # 價格
+    price = models.IntegerField(default=0, verbose_name='價格')
+    # 商品分類
+    type = models.ForeignKey('ProductTypeModel', on_delete=models.CASCADE, verbose_name='商品分類', null=True, blank=True)
+    # 顏色
+    color = models.ForeignKey('ColorModel', on_delete=models.CASCADE, verbose_name='顏色', null=True, blank=True)
+    # 尺寸
+    size = models.ForeignKey('SizeModel', on_delete=models.CASCADE, verbose_name='尺寸', null=True, blank=True)
+    # 庫存
+    stock = models.PositiveIntegerField(default=0, verbose_name='庫存')
 
     class Meta:
         verbose_name = '商品'
         verbose_name_plural = '商品'
 
+# 商品分類模型
 class ProductTypeModel(models.Model):
-    TypeID = models.AutoField(primary_key=True, verbose_name='分類ID')
-    TypeName = models.CharField(max_length=50, verbose_name='分類名稱')
+    # 分類ID
+    type_id = models.AutoField(primary_key=True, verbose_name='分類ID')
+    # 分類名稱
+    type_name = models.CharField(max_length=50, verbose_name='分類名稱')
 
     class Meta:
         verbose_name = '商品分類'
         verbose_name_plural = '商品分類'
 
+# 顏色模型
 class ColorModel(models.Model):
-    ColorID = models.AutoField(primary_key=True, verbose_name='顏色ID')
-    ColorName = models.CharField(max_length=50, verbose_name='顏色名稱')
+    # 顏色ID
+    color_id = models.AutoField(primary_key=True, verbose_name='顏色ID')
+    # 顏色名稱
+    color_name = models.CharField(max_length=50, verbose_name='顏色名稱')
 
     class Meta:
         verbose_name = '顏色'
         verbose_name_plural = '顏色'
 
+# 尺寸模型
 class SizeModel(models.Model):
-    SizeID = models.AutoField(primary_key=True, verbose_name='尺寸ID')
-    SizeName = models.CharField(max_length=50, verbose_name='尺寸名稱')
+    # 尺寸ID
+    size_id = models.AutoField(primary_key=True, verbose_name='尺寸ID')
+    # 尺寸名稱
+    size_name = models.CharField(max_length=50, verbose_name='尺寸名稱')
 
     class Meta:
         verbose_name = '尺寸'
         verbose_name_plural = '尺寸'
 
+# 圖片模型
 class ImageModel(models.Model):
-    ImageID = models.AutoField(primary_key=True, verbose_name='圖片ID')
-    Product = models.ForeignKey('Products', on_delete=models.CASCADE, verbose_name='商品', related_name='images',null=True)
-    ImageName = models.CharField(max_length=100, verbose_name='圖片名稱')
+    # 圖片ID
+    id = models.AutoField(primary_key=True, verbose_name='圖片ID')
+    # 商品
+    product = models.ForeignKey('Products', on_delete=models.CASCADE, verbose_name='商品', related_name='images', null=True)
+    # 圖片
+    image = models.ImageField(upload_to='images/', verbose_name='圖片')
+    # 圖片名稱
+    name = models.CharField(max_length=100, verbose_name='圖片名稱', null=True, blank=True)
 
     class Meta:
         verbose_name = '圖片'
         verbose_name_plural = '圖片'
 
+# 商品敘述模型
 class DescriptionModel(models.Model):
-    DescriptionID = models.AutoField(primary_key=True, verbose_name='敘述ID')
-    Product = models.ForeignKey('Products', on_delete=models.CASCADE, verbose_name='商品', related_name='descriptions',default='')
-    Description = models.TextField(verbose_name='敘述')
+    # 敘述ID
+    description_id = models.AutoField(primary_key=True, verbose_name='敘述ID')
+    # 商品
+    product = models.ForeignKey('Products', on_delete=models.CASCADE, verbose_name='商品', related_name='descriptions', default='')
+    # 敘述
+    description = models.TextField(verbose_name='敘述')
 
     class Meta:
         verbose_name = '商品敘述'
         verbose_name_plural = '商品敘述'
 
-#商品顏色尺寸庫存
+   
+# 商品顏色尺寸庫存模型
 class ProductColorSizeStockModel(models.Model):
-    InventoryID = models.AutoField(primary_key=True, verbose_name='ID')
-    Product_id = models.ForeignKey(Products, on_delete=models.CASCADE, verbose_name='商品ID', related_name='productcolorsizestocks')
-    Color_id = models.ForeignKey(ColorModel, on_delete=models.CASCADE, verbose_name='顏色ID', related_name='productcolorsizestocks')
-    Size_id = models.ForeignKey(SizeModel, on_delete=models.CASCADE, verbose_name='尺寸ID', related_name='productcolorsizestocks')
-    Stock = models.PositiveIntegerField(default=0, verbose_name='庫存') 
+    # ID
+    inventory_id = models.AutoField(primary_key=True, verbose_name='ID')
+    # 商品ID
+    product = models.ForeignKey('Products', on_delete=models.CASCADE, verbose_name='商品ID', related_name='product_color_size_stocks')
+    # 顏色ID
+    color = models.ForeignKey('ColorModel', on_delete=models.CASCADE, verbose_name='顏色ID', related_name='product_color_size_stocks')
+    # 尺寸ID
+    size = models.ForeignKey('SizeModel', on_delete=models.CASCADE, verbose_name='尺寸ID', related_name='product_color_size_stocks')
+    # 庫存
+    stock = models.PositiveIntegerField(default=0, verbose_name='庫存')
