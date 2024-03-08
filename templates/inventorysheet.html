@@ -74,18 +74,18 @@
                 <th>📦庫存</th>
             </tr>
             {% for order in resultList %}
+            <tr>
+                <td>{{ order.type.type_id }}</td>
+                <td>{{ order.type.type_name }}</td>
+                <td>{{ order.product_name }}</td>
+                <td>{{ order.price }}</td>
                 {% for data in order.product_color_size_stocks.all %}
-                <tr>
-                    <td>{{ order.type.type_id }}</td>
-                    <td>{{ order.type.type_name }}</td>
-                    <td>{{ order.product_name }}</td>
-                    <td>{{ order.price }}</td>
                     <td>{{ data.color.color_name }}</td>
                     <td>{{ data.size.size_name }}</td>
                     <td>{{ data.stock }}</td>
-                </tr>
                 {% endfor %}
-            {% endfor %}     
+            </tr>
+            {% endfor %}
         </table>
         <nav aria-label="Page navigation example">
             <div class="d-flex justify-content-center">
@@ -123,11 +123,10 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             updateTableVisibility();
-            updatePageSelect(); // 初始化下拉选择框的选项
-            pageSelect.value = currentPage; // 设置下拉选择框的值为当前页码
+            updatePagination(); // 初始化分页
         });
         // 獲取數據總數和每頁顯示的數據量
-        var totalData = {{ productcolorsizestocks|length }};
+        var totalData = {{ product_color_size_stocks|length }};
         var itemsPerPage = 10; // 每頁顯示10條數據
     
         // 計算總頁數
@@ -139,78 +138,57 @@
         // 每次只顯示最多的頁碼數（這裡設為5）
         var maxVisiblePages = 5;
     
-// 獲取分頁元素
-var pagination = document.querySelector('.pagination');
-var previousPage = document.getElementById('previousPage');
-var nextPage = document.getElementById('nextPage');
-var pageSelect; // 將pageSelect定義為全局變量
+    // 獲取分頁元素
+    var pagination = document.querySelector('.pagination');
+    var previousPage = document.getElementById('previousPage');
+    var nextPage = document.getElementById('nextPage');
+    var pageSelect; // 將pageSelect定義為全局變量
 
-// 更新分頁元素的可見性
-function updatePagination() {
-    // 重新獲取pageSelect元素
-    pageSelect = document.getElementById('pageSelect');
-    // 確認pageSelect存在後再執行後續操作
-    if (pageSelect) {
-        if (totalPages <= 1) {
-            pagination.style.display = 'none';
-        } else {
-            pagination.style.display = 'block';
+        // 更新分頁元素的可見性
+        function updatePagination() {
+            // 重新獲取pageSelect元素
+            pageSelect = document.getElementById('pageSelect');
+            console.log(pageSelect);
+            // 確認pageSelect存在後再執行後續操作
+            if (pageSelect) {
+                if (totalPages <= 1) {
+                    pagination.style.display = 'none';
+                } else {
+                    pagination.style.display = 'block';
 
-            // 清空分頁元素
-            pagination.innerHTML = '';
+                    // 清空分頁元素
+                    pagination.innerHTML = '';
 
-            // 添加上一頁鏈接
-            if (currentPage > 1) {
-                pagination.appendChild(createPageLink(currentPage - 1, 'Previous', '&laquo;'));
+                    // 添加上一頁鏈接
+                    if (currentPage > 1) {
+                        pagination.appendChild(createPageLink(currentPage - 1, 'Previous', '&laquo;'));
+                    }
+
+                    // 計算要顯示的頁碼範圍
+                    var startPage = Math.max(currentPage - Math.floor(maxVisiblePages / 2), 1);
+                    var endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+
+                    // 如果末尾頁碼不足 maxVisiblePages，則調整 startPage
+                    if (endPage - startPage + 1 < maxVisiblePages) {
+                        startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+                    }
+
+                    // 添加頁碼鏈接
+                    for (var i = startPage; i <= endPage; i++) {
+                        pagination.appendChild(createPageLink(i, 'Page ' + i, i.toString()));
+                    }
+
+                    // 添加下一頁鏈接
+                    if (currentPage < totalPages) {
+                        pagination.appendChild(createPageLink(currentPage + 1, 'Next', '&raquo;'));
+                    }
+                }
+
+                // 更新下拉選單的選項
+                updatePageSelect();
+            } else {
+                console.error("pageSelect 元素未找到！");
             }
-
-            // 計算要顯示的頁碼範圍
-            var startPage = Math.max(currentPage - Math.floor(maxVisiblePages / 2), 1);
-            var endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
-
-            // 如果末尾頁碼不足 maxVisiblePages，則調整 startPage
-            if (endPage - startPage + 1 < maxVisiblePages) {
-                startPage = Math.max(endPage - maxVisiblePages + 1, 1);
-            }
-
-            // 添加頁碼鏈接
-            for (var i = startPage; i <= endPage; i++) {
-                pagination.appendChild(createPageLink(i, 'Page ' + i, i.toString()));
-            }
-
-            // 添加下一頁鏈接
-            if (currentPage < totalPages) {
-                pagination.appendChild(createPageLink(currentPage + 1, 'Next', '&raquo;'));
-            }
-        }
-
-        // 更新下拉選單的選項
-        updatePageSelect();
-    } else {
-        console.error("pageSelect 元素未找到！");
-    }
-}
-    
-        // Helper 函數來創建分頁鏈接
-        function createPageLink(page, label, content) {
-            var li = document.createElement('li');
-            li.className = 'page-item';
-            if (page === currentPage) {
-                li.classList.add('active');
-            }
-            var a = document.createElement('a');
-            a.className = 'page-link';
-            a.href = '#';
-            a.textContent = content;
-            a.setAttribute('aria-label', label);
-            a.addEventListener('click', function (e) {
-                e.preventDefault();
-                currentPage = page;
-                updatePagination();
-                updateTableVisibility();
-            });
-            li.appendChild(a);
-            return li;
         }
     
         // Helper 函數來更新下拉選單的選項
@@ -259,10 +237,10 @@ function updatePagination() {
         function updateTableVisibility() {
             var startIndex = (currentPage - 1) * itemsPerPage;
             var endIndex = Math.min(currentPage * itemsPerPage, totalData);
-    
+        
             var tableRows = document.querySelectorAll('#data-table tr');
             tableRows.forEach(function (row, index) {
-                if (index < 2 || (index >= startIndex + 1 && index <= endIndex)) {
+                if (index === 0 || (index >= startIndex + 1 && index <= endIndex)) {
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';

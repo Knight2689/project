@@ -563,6 +563,7 @@ def inventorysheet(request):  #庫存查詢
             
             resultList = Products.objects.prefetch_related('product_color_size_stocks', 'product_color_size_stocks__color', 'product_color_size_stocks__size').filter(q_objects)
             product_color_size_stocks = ProductColorSizeStockModel.objects.all()
+            print('resultList:', resultList)
     else:   
         resultList = Products.objects.prefetch_related('product_color_size_stocks', 'product_color_size_stocks__color', 'product_color_size_stocks__size').all().order_by('type')
         print('resultList=',resultList)
