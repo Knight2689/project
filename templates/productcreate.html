@@ -54,7 +54,6 @@
                 <td>
                     <select id="color_id" name="color_id" class="form-control" required>
                         <option value="">選擇顏色</option>
-                        <!-- 这里是初始的选项，会在 JavaScript 中被替换 -->
                     </select>
                     <form id="add-color-form">
                         {% csrf_token %}
@@ -156,18 +155,18 @@
 
 
     $(document).ready(function() {
-        // 当表单提交时执行
+        // 當表單提交時執行
         $('#upload-form').submit(function(event) {
-            // 防止表单默认提交行为
+            // 防止表單預設提交行為
             event.preventDefault();
             
-            // 创建一个FormData对象
+            // 建立一個FormData對象
             var formData = new FormData(this);
             
-            // 将文件字段命名为'image'
+            // 將文件欄位命名為'image'
             formData.set('image', $('#image_file')[0].files[0]);
             
-            // 添加产品信息到FormData对象
+            // 新增產品資訊到FormData對象
             formData.append('product_name', $('#product_name').val());
             formData.append('product_price', $('#product_price').val());
             formData.append('type_id', $('#type_id').val());
@@ -175,15 +174,15 @@
             formData.append('size_id', $('#size_id').val());
             formData.append('stock', $('#stock').val());
             
-            // 使用AJAX向后端发送POST请求，包含FormData对象
+            // 使用AJAX向後端發送POST請求，包含FormData對象
             $.ajax({
-                url: $(this).attr('action'), // 使用表单的action属性作为URL
+                url: $(this).attr('action'), // 使用表單的action屬性作為URL
                 type: 'POST',
                 data: formData,
-                processData: false,  // 不处理数据
-                contentType: false,  // 不设置内容类型
+                processData: false,  // 不處理數據
+                contentType: false,  // 不設定內容類型
                 success: function(response) {
-                    // 处理成功响应
+                    // 處理成功回應
                     console.log(response);
                 },
                 error: function(xhr, textStatus, error) {
@@ -195,7 +194,7 @@
     });
     
     $(document).ready(function() {
-        // 添加新分类
+        // 新增分類
         $('#add_type_btn').click(function() {
             var newTypeName = $('#new_type_name').val();
             $.ajax({
@@ -203,9 +202,9 @@
                 type: 'POST',
                 data: {type_name: newTypeName},
                 success: function(response) {
-                    // 清空输入框
+                    // 清空輸入框
                     $('#new_type_name').val('');
-                    // 添加新选项到下拉菜单
+                    // 新增選項到下拉式選單
                     $('#type_id').append($('<option>', {
                         value: response.type_id,
                         text: response.type_name
@@ -217,7 +216,7 @@
             });
         });
     
-        // 添加新颜色
+        // 新增顏色
         $('#add_color_btn').click(function() {
             var newColorName = $('#new_color_name').val();
             $.ajax({
@@ -225,9 +224,9 @@
                 type: 'POST',
                 data: {color_name: newColorName},
                 success: function(response) {
-                    // 清空输入框
+                    // 清空輸入框
                     $('#new_color_name').val('');
-                    // 添加新选项到下拉菜单
+                    // 新增選項到下拉式選單
                     $('#color_id').append($('<option>', {
                         value: response.color_id,
                         text: response.color_name
@@ -239,7 +238,7 @@
             });
         });
     
-        // 添加新尺寸
+        // 新增尺寸
         $('#add_size_btn').click(function() {
             var newSizeName = $('#new_size_name').val();
             $.ajax({

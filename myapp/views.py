@@ -52,12 +52,12 @@ def get_product_sizes(request):
     # 傳回 JSON 格式的數據
     return JsonResponse(serialized_product_sizes, safe=False)
 
-# 创建一个信号量，用于在 Products 模型保存后更新 ProductColorSizeStockModel 记录
+# 建立一個信號量，用於在 Products 模型保存後更新 ProductColorSizeStockModel 記錄
 @receiver(post_save, sender=Products)
 def update_product_color_size_stock(sender, instance, **kwargs):
-    # 检查信号量是否为创建新记录，而不是更新现有记录
+    # 檢查信號量是否為建立新記錄，而不是更新現有記錄
     if kwargs['created']:
-        # 如果是创建新记录，则创建相应的 ProductColorSizeStockModel 记录
+        # 如果是建立新記錄，則建立對應的 ProductColorSizeStockModel 記錄
         product_color_size_stock = ProductColorSizeStockModel.objects.create(
             product=instance,
             color=instance.color,
@@ -65,37 +65,37 @@ def update_product_color_size_stock(sender, instance, **kwargs):
             stock=instance.stock
         )
     else:
-        # 如果是更新现有记录，则更新相应的 ProductColorSizeStockModel 记录
+        # 如果是更新現有記錄，則更新對應的 ProductColorSizeStockModel 記錄
         product_color_size_stock = ProductColorSizeStockModel.objects.get(product=instance)
         product_color_size_stock.stock = instance.stock
         product_color_size_stock.save()
 
-# 添加新分类的视图
+# 新增分類的視圖
 @csrf_exempt
 def add_product_type(request):
     if request.method == 'POST':
         type_name = request.POST.get('type_name')
         new_type = ProductTypeModel.objects.create(type_name=type_name)
         return JsonResponse({'type_id': new_type.type_id, 'type_name': new_type.type_name})
-    return JsonResponse({'error': 'Invalid request method'})
+    return JsonResponse({'error': '請求方法無效'})
 
-# 添加新颜色的视图
+# 新增顏色的視圖
 @csrf_exempt
 def add_product_color(request):
     if request.method == 'POST':
         color_name = request.POST.get('color_name')
         new_color = ColorModel.objects.create(color_name=color_name)
         return JsonResponse({'color_id': new_color.color_id, 'color_name': new_color.color_name})
-    return JsonResponse({'error': 'Invalid request method'})
+    return JsonResponse({'error': '請求方法無效'})
 
-# 添加新尺寸的视图
+# 新增尺寸的視圖
 @csrf_exempt
 def add_product_size(request):
     if request.method == 'POST':
         size_name = request.POST.get('size_name')
         new_size = SizeModel.objects.create(size_name=size_name)
         return JsonResponse({'size_id': new_size.size_id, 'size_name': new_size.size_name})
-    return JsonResponse({'error': 'Invalid request method'})
+    return JsonResponse({'error': '請求方法無效'})
 
 
 
@@ -465,7 +465,7 @@ def productcreate(request):
         color_id = request.POST.get("color_id", None)
         size_id = request.POST.get("size_id", None)
         stock = request.POST.get("stock", 0)
-        image = request.FILES.get("image_file", None)  # 获取上传的图像文件
+        image = request.FILES.get("image_file", None)  # 取得上傳的圖像文件
 
         print("Product Name:", product_name)
         print("Price:", price)
