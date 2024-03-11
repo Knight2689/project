@@ -466,6 +466,7 @@ def productcreate(request):
         size_id = request.POST.get("size_id", None)
         stock = request.POST.get("stock", 0)
         image = request.FILES.get("image_file", None)  # 取得上傳的圖像文件
+        description = request.POST.get("description", "") # 取得商品敘述
 
         print("Product Name:", product_name)
         print("Price:", price)
@@ -474,7 +475,8 @@ def productcreate(request):
         print("Size ID:", size_id)
         print("Stock:", stock)
         print("Image:", image)
-
+        print("Description:", description)
+        
         # 處理圖像上傳
         new_image = None
         if image:
@@ -486,11 +488,14 @@ def productcreate(request):
         add = Products(product_name=product_name, price=price, type_id=type_id, color_id=color_id, size_id=size_id, stock=stock)
         add.save()
 
+        # 建立商品敘述
+        DescriptionModel.objects.create(product=add, description=description)
+
         # 將圖像關聯到產品
         if new_image:
             add.image = new_image
             add.save()
-
+            
         return JsonResponse({'message': '商品新增成功'})  # 返回成功信息
     else:
         product_types = ProductTypeModel.objects.all()
@@ -579,6 +584,22 @@ def inventorysheet(request):  #庫存查詢
         status = True
     return render(request,"inventorysheet.html",locals())     
 
+@csrf_exempt
+def inventorysheetdelete(request, id=None):  #刪除庫存資料
+    if request.method == "POST":
+        product_id = request.POST.get('product_id')
+        try:
+            product = Products.objects.get(product_id=product_id)
+            product.delete()
+            return redirect("/inventorysheet/")  # 重定向到庫存列表頁面
+        except Products.DoesNotExist:
+            return HttpResponse("該產品不存在或已被刪除")
+    else:
+        try:
+            dict_data = Products.objects.get(product_id=id)
+        except Products.DoesNotExist:
+            return HttpResponse("該產品不存在或已被刪除")
+        return render(request, "inventorysheetdelete.html", locals())  
 
 #使用者
 def subject(request):#首頁
@@ -616,71 +637,7 @@ def login(request):  #登入
     else:
         postform = forms.PostForm()
         return render(request, "login.html",locals())
-    
-@csrf_exempt
-def ordertable(request):  #商品訂單
-    if 'site_search' in request.POST:
-        site_search = request.POST["site_search"]
-        site_search = site_search.strip() #去空白
-        keywords = site_search.split(" ")#字元切割
-        q_objects = Q()
-        for keyword in keywords:
-            if keyword != "":
-                status = True
-                q_objects.add(Q(order__id__contains=keyword), Q.OR)
-                q_objects.add(Q(product_name__contains=keyword), Q.OR)
-                q_objects.add(Q(color__contains=keyword), Q.OR)
-                q_objects.add(Q(size__contains=keyword), Q.OR)
-                q_objects.add(Q(unit_price__contains=keyword), Q.OR)
-                q_objects.add(Q(quantity__contains=keyword), Q.OR)
-                q_objects.add(Q(total__contains=keyword), Q.OR)
-            resultList = DetailModel.objects.filter(q_objects)
-    else:    
-        resultList = DetailModel.objects.all().order_by('order_id')
-        print('resultList=',resultList)
-    if not resultList:
-        errormessage = "無資料"
-        status = False
-    else:
-        errormessage = ""
-        status = True
-    return render(request,"ordertable.html",locals())  
-
-
-@csrf_exempt
-def ordertableedit(request, id=None):  #編輯商品訂單
-    if request.method == "POST":
-        dname = request.POST.get("dname", None)
-        dcolor = request.POST.get("dcolor",None)
-        dsize = request.POST.get("dsize",None)
-        dunitprice = request.POST.get("dunitprice",0)
-        dquantity = request.POST.get("dquantity",0)
-        dtotal = request.POST.get("dtotal",0)
-        update = DetailModel.objects.get(id=id)
-        update.dname = dname
-        update.dcolor = dcolor
-        update.dsize = dsize
-        update.dunitprice = dunitprice
-        update.dquantity = dquantity
-        update.dtotal = dtotal
-        update.save()
-        return redirect('/ordertable/')
-    
-    else:
-        update = DetailModel.objects.get(id=id)
-        return render(request,"ordertableedit.html",locals()) 
-
-
-@csrf_exempt    
-def ordertabledelete(request, id=None):  #刪除商品訂單
-    if request.method == "POST":
-        data = DetailModel.objects.get(id=id)
-        data.delete()
-        return redirect("/ordertable/")
-    else:
-        dict_data = DetailModel.objects.get(id=id)
-        return render(request,"ordertabledelete.html",locals())  
-        
+       
 @csrf_exempt
 def signup(request):  #註冊
     if request.method == "POST":
@@ -912,67 +869,67 @@ def classification(request, type=None):  #分類頁面
     response.set_cookie("total_views", str(total_views), expires=expires)
     if type == 'brand':
         type = 'EncounterU品牌款'
-        products = products.filter(Type_id__TypeName='EncounterU品牌款')
+        products = products.filter(type__TypeName='EncounterU品牌款')
     elif type == 'hot':
         type = '熱賣商品'
-        products = products.filter(Type_id__TypeName='熱賣商品')
+        products = products.filter(type__TypeName='熱賣商品')
     elif type == 'caot':
         type = '外套'
-        products = products.filter(Type_id__TypeName='外套')
+        products = products.filter(type__TypeName='外套')
     elif type == 'short':
         type = '短袖'
-        products = products.filter(Type_id__TypeName='短袖') 
+        products = products.filter(type__TypeName='短袖') 
     elif type == 'sleeves':
         type = '長袖 / 7分袖'
-        products = products.filter(Type_id__TypeName='長袖 / 7分袖') 
+        products = products.filter(type__TypeName='長袖 / 7分袖') 
     elif type == 'vest':
         type = '背心'
-        products = products.filter(Type_id__TypeName='背心') 
+        products = products.filter(type__TypeName='背心') 
     elif type == 'shirt':
         type = '襯衫'
-        products = products.filter(Type_id__TypeName='襯衫') 
+        products = products.filter(type__TypeName='襯衫') 
     elif type == 'shorts':
         type = '短褲'
-        products = products.filter(Type_id__TypeName='短褲') 
+        products = products.filter(type__TypeName='短褲') 
     elif type == 'pants':
         type = '長褲'
-        products = products.filter(Type_id__TypeName='長褲') 
+        products = products.filter(type__TypeName='長褲') 
     elif type == 'jeans':
         type = '牛仔褲'
-        products = products.filter(Type_id__TypeName='牛仔褲') 
+        products = products.filter(type__TypeName='牛仔褲') 
     elif type == 'culottes':
         type = '短/長/褲裙'
-        products = products.filter(Type_id__TypeName='短/長/褲裙') 
+        products = products.filter(type__TypeName='短/長/褲裙') 
     elif type == 'overalls':
         type = '短/長吊帶褲'
-        products = products.filter(Type_id__TypeName='短/長吊帶褲')
+        products = products.filter(type__TypeName='短/長吊帶褲')
     elif type == 'sleevelessdress':
         type = '無袖洋裝'
-        products = products.filter(Type_id__TypeName='無袖洋裝') 
+        products = products.filter(type__TypeName='無袖洋裝') 
     elif type == 'shortsleevedress':
         type = '短袖洋裝'
-        products = products.filter(Type_id__TypeName='短袖洋裝') 
+        products = products.filter(type__TypeName='短袖洋裝') 
     elif type == 'longsleevedress':
         type = '長袖洋裝'
-        products = products.filter(Type_id__TypeName='長袖洋裝') 
+        products = products.filter(type__TypeName='長袖洋裝') 
     elif type == 'jumpsuit':
         type = '連身套裝'
-        products = products.filter(Type_id__TypeName='連身套裝') 
+        products = products.filter(type__TypeName='連身套裝') 
     elif type == 'suit':
         type = '無袖套裝'
-        products = products.filter(Type_id__TypeName='無袖套裝') 
+        products = products.filter(type__TypeName='無袖套裝') 
     elif type == 'shortsleevedresssuit':
         type = '短袖套裝'
-        products = products.filter(Type_id__TypeName='短袖套裝') 
+        products = products.filter(type__TypeName='短袖套裝') 
     elif type == 'longsleevedresssuit':
         type = '長袖套裝'
-        products = products.filter(Type_id__TypeName='長袖套裝') 
+        products = products.filter(type__TypeName='長袖套裝') 
     elif type == 'bag':
         type = '包包'
-        products = products.filter(Type_id__TypeName='包包') 
+        products = products.filter(type__TypeName='包包') 
     elif type == 'discount':
         type = '特價商品'
-        products = products.filter(Type_id__TypeName='特價商品') 
+        products = products.filter(type__TypeName='特價商品') 
    
     return render(request, "classification.html", locals())
 
@@ -982,17 +939,17 @@ def productcontent(request,productid=None):  #商品資訊
     if user_id:
         user = registered_user.objects.get(id=user_id)
     productall = Products.objects.all()
-    product = Products.objects.get(ProductID=productid)  #取得商品
-    images = ImageModel.objects.filter(Product_id=product)
-    description = DescriptionModel.objects.get(Product_id=product)
+    product = Products.objects.get(product_id=productid)  #取得商品
+    images = ImageModel.objects.filter(product=product)
+    description = DescriptionModel.objects.get(product=product)
     color_set = set()  # 創建一個空集合來儲存唯一的顏色
     unique_colors = []  # 創建一個空列表來儲存唯一的顏色
     size_set = set()  # 創建一個空集合來儲存唯一的尺寸
     unique_sizes = []  # 創建一個空列表來儲存唯一的尺寸
-    stocks = ProductColorSizeStockModel.objects.filter(Product_id=product)
+    stocks = ProductColorSizeStockModel.objects.filter(product=product)
     for stock in stocks:
-        color_name = stock.Color_id.ColorName
-        size_name = stock.Size_id.SizeName
+        color_name = stock.color.color_name
+        size_name = stock.size.size_name
         if color_name not in color_set:
         # 如果顏色名稱不在集合中，將其添加到集合和唯一顏色列表
             color_set.add(color_name)
@@ -1024,3 +981,116 @@ def productcontent(request,productid=None):  #商品資訊
     response.set_cookie("total_views", str(total_views), expires=expires)
 
     return render(request, "productcontent.html", locals())
+
+def get_stock(request):  #獲取庫存數量
+    Product_id = request.GET.get('Product_id')
+    Color_id = request.GET.get('Color_id')
+    Size_id = request.GET.get('Size_id')
+    Color_id = ColorModel.objects.get(ColorName=Color_id).color_id
+    Size_id = SizeModel.objects.get(SizeName=Size_id).size_id
+    try:
+        stock = ProductColorSizeStockModel.objects.get(Product_id=Product_id, Color_id=Color_id, Size_id=Size_id)
+        stock_quantity = stock.Stock
+    except ProductColorSizeStockModel.DoesNotExist:
+        stock_quantity = 0
+
+    return JsonResponse({'stock_quantity': stock_quantity})
+
+@csrf_exempt
+def addtocart(request, ctype=None, productid=None):  #加入購物車
+    global cartlist
+    if ctype == 'add':
+        productall = Products.objects.all()
+        product = Products.objects.get(ProductID=productid)
+        selected_color = request.POST.get('selectedColor')
+        selected_size = request.POST.get('selectedSize')
+        select_number = int(request.POST.get('stock'))
+        Color_id = ColorModel.objects.get(ColorName=selected_color).ColorID
+        Size_id = SizeModel.objects.get(SizeName=selected_size).SizeID
+        stock = ProductColorSizeStockModel.objects.get(Product_id=product, Color_id=Color_id, Size_id=Size_id)
+        stock_quantity = stock.Stock
+        images = ImageModel.objects.filter(Product_id=product)
+        first_images = {}
+        for i in productall:
+            product_images = images.filter(Product_id=i.ProductID)
+            if product_images:
+                first_images[i.ProductID] = product_images[0]
+        image = first_images.get(product.ProductID, None)
+        # existing_item 設為 None
+        existing_item = None
+        for unit in cartlist:
+            # 檢查購物車中是否已存在相同商品、顏色和尺寸的項目
+            if (
+                unit[0] == product.ProductName
+                and unit[5] == selected_color
+                and unit[6] == selected_size
+            ):
+                existing_item = unit
+                break
+        if existing_item:
+            # 如果該項目已存在，更新其數量
+            existing_item[2] = str(int(existing_item[2]) + select_number)
+            existing_item[3] = str(int(existing_item[1]) * int(existing_item[2]))
+        else:
+            # 如果該項目不存在，將新項目添加到購物車
+            temlist = [
+                product.ProductName,
+                str(product.Price),
+                str(select_number),
+                str(product.Price * select_number),
+                image.ImageName if image else "",  # 使用 image 變數的值，如果不存在，則為空字符串
+                selected_color,
+                selected_size,
+                str(select_number),
+                str(stock_quantity),
+            ]
+            cartlist.append(temlist)
+        request.session['cartlist'] = cartlist
+        return redirect('/cart/')
+    elif ctype == 'update':
+        updated_cartlist = []
+        for index, unit in enumerate(cartlist):
+            newnumber = request.POST.get(f'newnumber_{index}')
+            checkout = request.POST.get(f'checkout_{index}')
+            if newnumber is not None:
+                newnumber = int(newnumber)
+                if newnumber > 0 and checkout == 'on':
+                    unit[2] = str(newnumber)
+                    unit[3] = str(int(unit[1]) * int(unit[2]))
+                    unit[7] = str(newnumber)
+                    updated_cartlist.append(unit)
+        cartlist = updated_cartlist
+        request.session['cartlist'] = cartlist
+        return redirect('/cartorder/')
+    elif ctype == 'empty':  #清空購物車
+        cartlist = []  #設購物車為空串列
+        request.session['cartlist'] = cartlist
+        return redirect('/cart/')
+    elif ctype == 'remove':  #刪除購物車中商品
+        del cartlist[int(productid)]  #從購物車串列中移除商品
+        request.session['cartlist'] = cartlist
+        return redirect('/cart/')    
+    
+@csrf_exempt
+def cart(request):  #購物車
+    global cartlist
+    user_id = request.session.get('user_id')
+    if user_id:
+        user = registered_user.objects.get(id=user_id)
+    products = Products.objects.all().order_by('?')[:2] #隨機排序並只取出2筆商品資訊
+    images = ImageModel.objects.all()
+    productall = Products.objects.all()
+    descriptions = DescriptionModel.objects.all()
+    first_images = {}
+    for i in productall:
+        product_images = images.filter(Product_id=i.ProductID)
+        if product_images:
+            first_images[i.ProductID] = product_images[0]
+    cartnum = len(cartlist)  #購買商品筆數
+    cartlist1 = cartlist  # 以區域變數傳給模版
+    total = 0
+    for unit in cartlist:  # 計算商品總金額
+        total += int(unit[3])
+        # for item in unit:
+        #     print(item)
+    return render(request, "cart.html", locals())

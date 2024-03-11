@@ -44,6 +44,7 @@ urlpatterns = [
     path('ordertableedit/<int:id>/',views.ordertableedit),  #編輯商品訂單
     path('ordertabledelete/<int:id>/',views.ordertabledelete),  #刪除商品訂單
     path('inventorysheet/',views.inventorysheet),  #庫存查詢
+    path('inventorysheetdelete/<int:id>/',views.inventorysheetdelete),  #刪除庫存
     path('image/<int:image_id>/', get_image, name='get_image'), #反應圖片成功與否
 
     #API
@@ -70,6 +71,8 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),  #登出
     path('classification/<str:type>/',views.classification, name='classification'),  #分類頁面
     path('productcontent/<int:productid>/',views.productcontent, name='productcontent'),  #商品資訊
-
+    path('get_stock/',views.get_stock),  #獲取庫存數量
+    path('cart/',views.cart),  #購物車
+    path('addtocart/<str:ctype>/<int:productid>/', views.addtocart),  #加入購物車
 ]
 
