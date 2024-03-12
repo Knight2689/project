@@ -128,7 +128,7 @@ class ImageModel(models.Model):
     # 圖片ID
     id = models.AutoField(primary_key=True, verbose_name='圖片ID')
     # 商品
-    product = models.ForeignKey('Products', on_delete=models.CASCADE, verbose_name='商品', related_name='images', null=True)
+    product = models.ForeignKey('Products', on_delete=models.CASCADE, verbose_name='商品', related_name='images')
     # 圖片
     image = models.ImageField(upload_to='images/', verbose_name='圖片')
     # 圖片名稱

@@ -1,16 +1,3 @@
-{% comment %} {% extends 'base.html' %}
-
-{% block title %}Encounter M - 首頁{% endblock %}
-
-{% block page_title %}首頁{% endblock %}
-
-{% block header_title %}創造出與眾不同的設計{% endblock %}
-
-{% block header_text %}我們專注於為您帶來最優質的設計服務，讓您的品牌脫穎而出。{% endblock %}
-
-{% block header_button %}
-<a href="#" class="btn btn-primary btn-lg">了解更多</a>
-{% endblock %} {% endcomment %}
 <!DOCTYPE html>
 <html lang="zh-tw">
 <head>
@@ -20,6 +7,7 @@
     <title>Encounter U</title>
     <link rel="stylesheet" href="{% static '/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static '/subject.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>  
     <nav class="navbar navbar-light bg-rgb(255, 255, 235) navbar-expand-md" id="top-1">
@@ -31,13 +19,13 @@
                         {% if user_id %}
                             <div>
                                 <a href="{% url 'logout' %}" id="sign_in">
-                                    <img src="{% static './images/member4_0.png' %}" id="member" /> {{ user.Username }} / 登出
+                                    <span class="bi bi-box-arrow-right id="member""></span> {{ user.Username }} / 登出
                                 </a>
                             </div>
                         {% else %}
                             <div>
                                 <a href="{% url 'login' %}" id="sign_in">
-                                    <img src="{% static './images/member4_0.png' %}" id="member" /> 登入/註冊
+                                    <span class="bi bi-box-arrow-right id="member""></span>  登入/註冊
                                 </a>
                             </div>
                         {% endif %}
@@ -54,7 +42,7 @@
                                 </a>
                             </p>
                         {% else %}
-                            <img src="{% static '/images/car.png' %}" id="cart" href="javascript:void(0);" onclick="doublecheck_login();" />
+                            <span class="bi bi-cart-fill" id="cart" href="javascript:void(0);" onclick="doublecheck_login();"></span>
                             <p class="d-md-inline d-none" id="top-2" href="javascript:void(0);" onclick="doublecheck_login();">購物車</p>
                         {% endif %}
                     </div>
@@ -187,8 +175,8 @@
                 <div class="carousel-caption d-none d-md-block"></div>
             </div>
             <div class="carousel-item" >
-                <a href="/productcontent/6/">
-                    <img src="{% static 'images/' %}{{ images.45.ImageName }}" class="d-block img-fluid " alt="h2" id="float_image"/>
+                <a href="/productcontent/10/">
+                    <img src="{% static 'images/' %}{{ images.13.name }}" class="d-block img-fluid " alt="h2" id="float_image"/>
                 </a>
                 <div class="carousel-caption d-none d-md-block"></div>
             </div>
@@ -258,9 +246,9 @@
                     <p id="atlogo">&copy;Encounter&nbsp;&nbsp;U</p>
                 </div>
                 <div class="text-center col-lg-3" id="socials">
-                    <a href="#"><img src="{% static './images/fb.png' %}" alt="fb"></a>&nbsp;
-                    <a href="#"><img src="{% static './images/line1.png' %}" alt="line1"></a>&nbsp;
-                    <a href="#"><img src="{% static './images/ig.png' %}" alt="ig"></a>&nbsp;
+                    <a href="#"><i class="bi bi-facebook"></i></a>&nbsp;
+                    <a href="#"><i class="bi bi-instagram"></i></a>&nbsp;
+                    <a href="#"><i class="bi bi-line"></i></a>&nbsp;
                 </div>
                 <div class="text-center col-lg-2   d-flex  align-items-center d-md-inline d-sm-none" id="surfing">
                     <p>今日瀏覽次數: {{ daily_views }}</p>

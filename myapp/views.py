@@ -22,6 +22,7 @@ from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+
 def get_product_types(request):
     # 查詢資料庫取得所有的產品分類信息
     product_types = ProductTypeModel.objects.all()
@@ -477,20 +478,29 @@ def productcreate(request):
         print("Image:", image)
         print("Description:", description)
         
-        # 處理圖像上傳
-        new_image = None
-        if image:
-            # 將圖像儲存到資料庫中，假設 ImageModel 模型中有一個名為 name 的欄位來保存圖像的名稱
-            new_image = ImageModel.objects.create(name=product_name, image=image)
-            print("Image uploaded successfully. Image ID:", new_image.id)
 
         # 建立產品實例，並將影像關聯到產品中
         add = Products(product_name=product_name, price=price, type_id=type_id, color_id=color_id, size_id=size_id, stock=stock)
+
+        # 如果有图片，则将图片关联到商品中
+        add = Products(product_name=product_name, price=price, stock=stock)
+        if type_id:
+            add.type = ProductTypeModel.objects.get(type_id=type_id)
+        if color_id:
+            add.color = ColorModel.objects.get(color_id=color_id)
+        if size_id:
+            add.size = SizeModel.objects.get(size_id=size_id)
         add.save()
 
         # 建立商品敘述
         DescriptionModel.objects.create(product=add, description=description)
 
+        # 處理圖像上傳
+        new_image = None
+        if image:
+            # 將圖像儲存到資料庫中，假設 ImageModel 模型中有一個名為 name 的欄位來保存圖像的名稱
+            new_image = ImageModel.objects.create(name=product_name, image=image, product=add)
+            print("Image uploaded successfully. Image ID:", new_image.id)
         # 將圖像關聯到產品
         if new_image:
             add.image = new_image
@@ -602,8 +612,47 @@ def inventorysheetdelete(request, id=None):  #刪除庫存資料
         return render(request, "inventorysheetdelete.html", locals())  
 
 #使用者
-def subject(request):#首頁
-    return render(request, "subject.html")
+def subject(request):  #首頁
+    global cartlist
+    if 'cartlist' in request.session:  #若session中存在cartlist就讀出
+        cartlist = request.session['cartlist']
+    else:  #重新購物
+        cartlist = []
+    images = ImageModel.objects.all()
+    productall = Products.objects.all()
+    descriptions = DescriptionModel.objects.all()
+    first_images = {}
+    for i in productall:
+        product_images = images.filter(product_id=i.product_id)
+        if product_images:
+            first_images[i.product_id] = product_images[0]
+    user_id = request.session.get('user_id')
+    print('user_id = ', user_id)
+    if user_id:
+        user = registered_user.objects.get(id=user_id)
+    page_name = 'subject'  # 此處使用您的頁面名稱
+
+    # 查找或創建 PageView
+    page, created = PageView.objects.get_or_create(page_name=page_name, date=datetime.date.today())
+
+    page.total_views = PageView.objects.aggregate(Sum('daily_views'))['daily_views__sum'] or 0
+
+    # 增加瀏覽次數
+    page.daily_views += 1
+    page.total_views += 1
+    page.save()
+
+    # 從 PageView 對象中獲取累計和當日瀏覽次數
+    total_views = page.total_views
+    daily_views = page.daily_views
+
+    tomorrow = timezone.now() + timezone.timedelta(days=1)
+    tomorrow = timezone.datetime.replace(tomorrow, hour=0, minute=0, second=0)
+    expires = timezone.datetime.strftime(tomorrow, "%a, %d-%b-%Y %H:%M:%S GMT")
+    response = render(request, "subject.html", {"total_views": total_views, "daily_views": daily_views})
+    response.set_cookie("total_views", str(total_views), expires=expires)
+
+    return render(request, "subject.html", locals())
 
 @csrf_exempt
 def login(request):  #登入
@@ -941,6 +990,7 @@ def productcontent(request,productid=None):  #商品資訊
     productall = Products.objects.all()
     product = Products.objects.get(product_id=productid)  #取得商品
     images = ImageModel.objects.filter(product=product)
+    # print(images)
     description = DescriptionModel.objects.get(product=product)
     color_set = set()  # 創建一個空集合來儲存唯一的顏色
     unique_colors = []  # 創建一個空列表來儲存唯一的顏色
@@ -1083,7 +1133,7 @@ def cart(request):  #購物車
     descriptions = DescriptionModel.objects.all()
     first_images = {}
     for i in productall:
-        product_images = images.filter(Product_id=i.ProductID)
+        product_images = images.filter(product_id=i.product_id)
         if product_images:
             first_images[i.ProductID] = product_images[0]
     cartnum = len(cartlist)  #購買商品筆數
@@ -1094,3 +1144,42 @@ def cart(request):  #購物車
         # for item in unit:
         #     print(item)
     return render(request, "cart.html", locals())
+
+@csrf_exempt
+def cartorder(request):  #確認訂單
+    user_id = request.session.get('user_id')
+    if user_id:
+        user = registered_user.objects.get(id=user_id)
+    global cartlist, message_purchase, customname, customphone, customaddress, customemail
+    cartlist1 = request.session['cartlist']
+    total = 0
+    for unit in cartlist1:  #計算商品總金額
+        unit[3] = str(int(unit[1]) * int(unit[2]))
+        total += int(unit[1]) * int(unit[2])
+    print(cartlist1)
+    if request.method == 'POST':
+        selected_shipping_method = request.POST.get('selected_shipping_method')
+        # 根據 selected_shipping_method 計算運費
+        if selected_shipping_method == '7-11':
+            shipping_fee = 60
+        elif selected_shipping_method == '黑貓宅急便':
+            shipping_fee = 200
+        else:
+            shipping_fee = 0
+        grand_total = total + shipping_fee
+        print('selected_shipping_method=', selected_shipping_method)
+        print('shipping_fee=', shipping_fee)
+        print('grand_total=', grand_total)
+        # 返回 JSON 響應，包含 shipping_fee 和 grand_total
+        response_data = {
+            'shipping_fee': shipping_fee,
+            'grand_total': grand_total,
+        }
+        return JsonResponse(response_data)   
+    user = registered_user.objects.get(id=user_id)
+    customname1 = user.username
+    customphone1 = user.user_tel
+    customemail1 = user.user_mail
+    message1 = message_purchase
+    return render(request, "cartorder.html", locals())
+

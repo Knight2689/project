@@ -188,6 +188,12 @@
                 success: function(response) {
                     // 處理成功回應
                     console.log(response);
+
+                    // 清空表单字段
+                    $('#upload-form')[0].reset();
+                
+                    // 弹出提示框
+                    alert('資料已送出！');
                 },
                 error: function(xhr, textStatus, error) {
                     // 处理错误响应

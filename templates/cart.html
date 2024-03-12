@@ -263,7 +263,7 @@
                             <tr class="cart-item">
                                 <td class="align-middle">
                                     <input type="checkbox" class="checkout" name="checkout_{{forloop.counter0}}">
-                                    <img src="{% static 'images/' %}{{unit.４}}" id="pic" />
+                                    <img src="{% static 'media\images' %}{{unit.４}}" id="pic" />
                                     {% comment %} 品名 {% endcomment %}
                                     <span>{{unit.0}}</span> 
                                     {% comment %} 顏色 {% endcomment %}
@@ -325,16 +325,16 @@
                                 {% endfor %}
                             </div>
                             <div class="card-body" id="card_body">
-                                <div class="card-title h5 text-danger">#{{product.ProductName}}</div> 
+                                <div class="card-title h5 text-danger">#{{product.product_name}}</div> 
                                 {% for description in descriptions %}
                                     {% if description.Product_id == product %}
-                                        <div class="card-text pb-3">{{ description.Description }}</div>  
+                                        <div class="card-text pb-3">{{ description.description }}</div>  
                                     {% endif %}
                                 {% endfor %}
                             </div>
                             <div class="card-footer" id="card_footer">
                                 <div class="card-text pb-3 text-front" id="nowrap">
-                                    NT${{product.Price}} &nbsp;<a href="/productcontent/{{product.ProductID}}" class="btn btn-outline-primary btn-lg">相關資訊</a>
+                                    NT${{product.price}} &nbsp;<a href="/productcontent/{{product.product_id}}" class="btn btn-outline-primary btn-lg">相關資訊</a>
                                 </div>
                             </div>
                         </div>

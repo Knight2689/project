@@ -19,6 +19,8 @@ from django.urls import path
 from django.conf.urls import include
 from myapp import views
 from myapp.views import get_product_types , get_product_colors , get_product_sizes , get_image
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -74,5 +76,8 @@ urlpatterns = [
     path('get_stock/',views.get_stock),  #獲取庫存數量
     path('cart/',views.cart),  #購物車
     path('addtocart/<str:ctype>/<int:productid>/', views.addtocart),  #加入購物車
-]
+    path('cart/',views.cart),  #購物車
+    path('cartorder/',views.cartorder),  #確認訂單
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
