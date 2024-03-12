@@ -22,6 +22,7 @@ from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+
 def get_product_types(request):
     # 查詢資料庫取得所有的產品分類信息
     product_types = ProductTypeModel.objects.all()
