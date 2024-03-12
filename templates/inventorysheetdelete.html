@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刪除庫存管理</title>
+    <link rel="stylesheet" href="{% static './managementdelete.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light" >
+    <div class="container">
+        <h1 class="title mx-auto"><b>庫存管理-刪除資料</b></h1>
+        <a href="/inventorysheet/" class="navbar-brand" style="margin-right: 20px;"><h4><b>返回</b></h4></a>
+    </div>
+</nav>
+<div class="container">
+    <form action="/inventorysheetdelete/{{ dict_data.product_id }}/" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="product_id" value="{{ dict_data.product_id }}">
+        <table class="table table-bordered">
+            <tr id="tabletop">
+                <th>欄位</th>
+                <th>庫存資訊</th>
+            </tr>
+            <tr>
+                <th><span>*</span>序列ID</th>
+                <td>{{ dict_data.product_id }}</td>
+            </tr>
+            <tr>
+                <th><span>*</span>分類</th>
+                <td>{{ dict_data.type.type_name }}</td>
+            </tr>
+            <tr>
+                <th><span>*</span>商品名稱</th>
+                <td>{{ dict_data.product_name }}</td>
+            </tr>
+            <tr>
+                <th><span>*</span>顏色</th>
+                <td>{{ dict_data.color.color_name }}</td>
+            </tr>
+            <tr>
+                <th><span>*</span>尺寸</th>
+                <td>{{ dict_data.size.size_name }}</td>
+            </tr>
+            <tr>
+                <th><span>*</span>庫存</th>
+                <td>{{ dict_data.stock }}</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center;">
+                    <button onclick="return doublecheck();" class="btn btn-danger btn-lg custom-margin" name="button">刪除</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<script src="{% static 'js/doublecheck_delete.js' %}"></script>
