@@ -71,13 +71,17 @@ a
 }
 /*以上為要繼承對象*/
 
+.carousel {
+    overflow: hidden; /* 不顯示超出輪播元素範圍的內容 */
+}
+
 /* 調整輪播元素的大小和響應式 */
 .carousel-item img {
-    max-width: 100%;
-    height: 100%;
-    object-fit: cover;
-    
+    width: 100vw; /* 將圖片寬度設定為視窗寬度 */
+    height: 100%; /* 將圖片高度設定為父元素高度的百分比，這裡父元素是輪播元素 */
+    object-fit: contain; /* 確保圖片完全可見，同時保持比例 */
 }
+
 /* 調整輪播按鈕的大小和位置 */
 .carousel-control-prev,
 .carousel-control-next {
@@ -99,14 +103,14 @@ a
 }
 .carousel
 {
-    padding-top: 20px;
-    background-color: lightpink;
+    padding-top: 0px;
+    background-color: chocolate;
     z-index: 1;
 }
 
 #float_image    /*輪播圖內容*/
 {
-    height: 800px;
+    /* height: 1280px; */
     background-size:contain;
 }
 
@@ -169,7 +173,8 @@ a
 #back 
 {
     position: fixed;
-    bottom: 130px;
+    right: 30px;
+    bottom: 100px;
     transition: transform 0.3s ease;
     z-index: 0;
 }

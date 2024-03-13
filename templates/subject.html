@@ -4,7 +4,7 @@
     {% load static %}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encounter U</title>
+    <title>Encounter M</title>
     <link rel="stylesheet" href="{% static '/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static '/subject.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -34,7 +34,7 @@
                         {% comment %} Add margin to create space between elements {% endcomment %}
                         {% if user_id %}
                             <a href="/cart/">
-                                <img src="{% static '/images/car.png' %}" id="cart" />
+                                <span class="bi bi-cart-fill" id="cart" /></span>
                             </a>
                             <p class="d-md-inline d-none">
                                 <a href="/cart/">
@@ -68,9 +68,6 @@
             </div>     
         </div>
     </nav>
-    <div class="container-fluid" id="logo" align="center">
-        <strong><a href="/subject/"><img src="{% static './images/LOGO2.png' %}" alt="Encounter" id="logo_image"></a></strong>
-    </div>
     <nav class="navbar navbar-expand-md navbar-light" id="btn-1" align="center">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">分類</a>
@@ -81,7 +78,7 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <div class="btn-group" >
                         <div class="btn2">
-                            <a href="/classification/brand/" type="button" class="btn dropdown btn-lg"><strong>Encounter U 品牌款</strong></a>
+                            <a href="/classification/brand/" type="button" class="btn dropdown btn-lg"><strong>Encounter M 品牌款</strong></a>
                         </div>
                     </div>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -169,32 +166,32 @@
         </ol>
         <div class="carousel-inner"align="center">
             <div class="carousel-item active" >
-                <a href="/productcontent/3/">  
-                <img src="{% static 'images/' %}{{ images.21.ImageName }}" class="d-block img-fluid" alt="h1" id="float_image"/>
+                <a href="/productcontent/15">
+                    <img src="{% static 'images/banner4.jpg' %}" class="d-block img-fluid " alt="h2" id="float_image"/>
                 </a>
                 <div class="carousel-caption d-none d-md-block"></div>
             </div>
             <div class="carousel-item" >
-                <a href="/productcontent/10/">
-                    <img src="{% static 'images/' %}{{ images.13.name }}" class="d-block img-fluid " alt="h2" id="float_image"/>
+                <a href="/productcontent/15">
+                    <img src="{% static 'images/banner6.jpg' %}" class="d-block img-fluid " alt="h2" id="float_image"/>
                 </a>
                 <div class="carousel-caption d-none d-md-block"></div>
             </div>
             <div class="carousel-item">
-                <a href="/productcontent/5/">
-                    <img src="{% static 'images/' %}{{ images.37.ImageName }}" class="d-block img-fluid" alt="h3" id="float_image"/>
+                <a href="/productcontent/15/">
+                    <img src="{% static 'images/banner4.jpg' %}" class="d-block img-fluid " alt="h2" id="float_image"/>
                 </a>
                 <div class="carousel-caption d-none d-md-block"></div>
             </div>
             <div class="carousel-item">
-                <a href="/productcontent/4/">
-                    <img src="{% static 'images/' %}{{ images.28.ImageName }}" class="d-block img-fluid" alt="h4" id="float_image"/>
+                <a href="/productcontent/15/">
+                    <img src="{% static 'images/banner6.jpg' %}" class="d-block img-fluid " alt="h2" id="float_image"/>
                 </a>
                 <div class="carousel-caption d-none d-md-block"></div>
             </div>
             <div class="carousel-item">
-                <a href="/productcontent/7/">
-                    <img src="{% static 'images/' %}{{ images.53.ImageName }}" class="d-block img-fluid" alt="h4" id="float_image"/>
+                <a href="/productcontent/15/">
+                    <img src="{% static 'images/banner4.jpg' %}" class="d-block img-fluid " alt="h2" id="float_image"/>
                 </a>
                 <div class="carousel-caption d-none d-md-block"></div>
             </div>
@@ -214,36 +211,34 @@
             <div class="col-12 col-md-6 col-lg-3">
                 <div class="card mt-2" id="card">
                     <div class="card-header">
-                        {% for product_id, first_image in first_images.items %}
-                            {% if first_image.Product_id == product %}
-                                <img class="card-img-bottom rounded mx-auto d-block" src="{% static 'images/' %}{{ first_image.ImageName  }}"/>
-                            {% endif %}
-                        {% endfor %}
+                        {% if product.images.exists %}
+                            <img class="card-img-bottom rounded mx-auto d-block" src="{{ product.images.first.image.url }}" />
+                        {% endif %}
                     </div>
                     <div class="card-body" id="card_body">
-                        <div class="card-tittle h5">#{{ product.ProductName }}</div> 
+                        <div class="card-tittle h5">#{{ product.product_name }}</div> 
                         {% for description in descriptions %}
-                            {% if description.Product_id == product %}
-                                <div class="card-text pb-3">{{ description.Description }}</div>  
+                            {% if description.product == product %}
+                                <div class="card-text pb-3">{{ description.description }}</div>  
                             {% endif %}
                         {% endfor %}
                     </div>
                     <div class="card-footer" id="card_footer">
                         <div class="card-text pb-3 text-front" id="nowrap">
-                            NT${{ product.Price }} &nbsp;<a href="/productcontent/{{ product.ProductID }}" class="btn btn-outline-primary btn-lg">相關資訊</a>
+                            NT${{ product.price }} &nbsp;<a href="/productcontent/{{ product.product_id }}" class="btn btn-outline-primary btn-lg">相關資訊</a>
                         </div>
                     </div>
                 </div>
             </div>
         {% endfor %}
     </div>
-    <a href="{% url 'subject' %}"  id="back"><img src="{% static './images/b.png' %}" ></a>
+    <a href="{% url 'subject' %}"  id="back"> <i class="bi bi-arrow-up"></i></a>
     <hr >
     <footer>
         <div class="container-fluid">
             <div class="row">
                 <div class="text-center col-lg-4">
-                    <p id="atlogo">&copy;Encounter&nbsp;&nbsp;U</p>
+                    <p id="atlogo">&copy;Encounter&nbsp;&nbsp;M</p>
                 </div>
                 <div class="text-center col-lg-3" id="socials">
                     <a href="#"><i class="bi bi-facebook"></i></a>&nbsp;

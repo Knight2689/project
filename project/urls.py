@@ -76,8 +76,12 @@ urlpatterns = [
     path('get_stock/',views.get_stock),  #獲取庫存數量
     path('cart/',views.cart),  #購物車
     path('addtocart/<str:ctype>/<int:productid>/', views.addtocart),  #加入購物車
-    path('cart/',views.cart),  #購物車
+    path('addtocart/<str:ctype>/', views.addtocart),  #加入購物車
     path('cartorder/',views.cartorder),  #確認訂單
+    path('cartok/',views.cartok), #訂購完成
+    path('ordernotificationemail/', views.ordernotificationemail, name='ordernotificationemail'),  #訂單通知信
+    path('cartordercheck/',views.cartordercheck),  #訂單查詢
+    path('modifymemberprofile/<int:id>/',views.modifymemberprofile),  #修改資料
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

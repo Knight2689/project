@@ -7,6 +7,7 @@
     <title>Encounter U</title>
     <link rel="stylesheet" href="{% static '/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static '/subject.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         /* 自定義CSS樣式 */
         .breadcrumb {
@@ -56,9 +57,9 @@
                         {% comment %} Add margin to create space between elements {% endcomment %}
                         {% if user_id %}
                             <a href="/cart/">
-                                <img src="{% static '/images/car.png' %}" id="cart" />
+                                <span class="bi bi-cart-fill" id="cart" /></span>
                             </a>
-                            <p class="d-md-inline d-none" id="top-2">
+                            <p class="d-md-inline d-none">
                                 <a href="/cart/">
                                     購物車
                                 </a>
@@ -91,9 +92,6 @@
                       
         </div>
     </nav>
-    <div class="container-fluid" id="logo" align="center">
-        <strong><a href="/subject/"><img src="{% static './images/LOGO2.png' %}" alt="Encounter" id="logo_image"></a></strong>
-    </div>
     <nav class="navbar navbar-expand-md navbar-light" id="btn-1" align="center">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">分類</a>
@@ -104,7 +102,7 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <div class="btn-group" >
                         <div class="btn2">
-                            <a href="/classification/brand/" type="button" class="btn dropdown btn-lg"><strong>Encounter U 品牌款</strong></a>
+                            <a href="/classification/brand/" type="button" class="btn dropdown btn-lg"><strong>Encounter M 品牌款</strong></a>
                         </div>
                     </div>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -117,7 +115,7 @@
                     <div class="btn-group" >
                         <div class="btn-group">
                             <div class="btn2">
-                                <a href="/classification/caot/" type="button" class="btn dropdown btn-lg">外套</a>
+                                <a href="/classification/coat/" type="button" class="btn dropdown btn-lg">外套</a>
                             </div>
                         </div>
                     </div>
@@ -221,13 +219,13 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="text-center col-lg-4">
-                    <p id="atlogo">&copy;Encounter&nbsp;&nbsp;U</p>
+                    <p id="atlogo">&copy;Encounter&nbsp;&nbsp;M</p>
                 </div>
                 <div class="text-center col-lg-3" id="socials">
-                    <a href="#"><img src="{% static './images/fb.png' %}" alt="fb"></a>&nbsp;
-                    <a href="#"><img src="{% static './images/line1.png' %}" alt="line1"></a>&nbsp;
-                    <a href="#"><img src="{% static './images/ig.png' %}" alt="ig"></a>&nbsp;
-                </div> 
+                    <a href="#"><i class="bi bi-facebook"></i></a>&nbsp;
+                    <a href="#"><i class="bi bi-instagram"></i></a>&nbsp;
+                    <a href="#"><i class="bi bi-line"></i></a>&nbsp;
+                </div>
                 <div class="text-center col-lg-2   d-flex  align-items-center d-md-inline d-sm-none" id="surfing">
                     <p>今日瀏覽次數: {{ daily_views }}</p>
                 </div>   

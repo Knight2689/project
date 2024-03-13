@@ -84,7 +84,7 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <div class="btn-group" >
                         <div class="btn2">
-                            <a href="/classification/brand/" type="button" class="btn dropdown btn-lg"><strong>Encounter U 品牌款</strong></a>
+                            <a href="/classification/brand/" type="button" class="btn dropdown btn-lg"><strong>Encounter M 品牌款</strong></a>
                         </div>
                     </div>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -237,7 +237,7 @@
                     <li>現貨狀況僅供參考，庫存依照付款先後分配</li>
                     <li>預購需7~20個工作天追加，急件請來電確認</li>
                     <li>每周一、四向韓國追加下單，照付款先後寄出</li>
-                    <li> 社團+1可和官網合併加入購物車一起付款</li>
+                    <li>社團+1可和官網合併加入購物車一起付款</li>
                     <li>付款後加單請聯繫客服</li>
                 </ul>
             </div>
@@ -251,7 +251,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="text-center col-lg-4">
-                    <p id="atlogo">&copy;Encounter&nbsp;&nbsp;U</p>
+                    <p id="atlogo">&copy;Encounter&nbsp;&nbsp;M</p>
                 </div>
                 <div class="text-center col-lg-3" id="socials">
                     <a href="#"><i class="bi bi-facebook"></i></a>&nbsp;
@@ -274,7 +274,8 @@
             const sizeRadios = document.querySelectorAll('input[name="selectedSize"]');
             const stockSelect = document.getElementById("stock");
             const maxStock = parseInt(stockSelect.getAttribute("data-stock"));
-            const product = {{ product.ProductID }};
+            const product = {{ product.product_id }};
+            
             // 監聽顏色和尺寸的選擇
             colorRadios.forEach(function (radio) {
                 radio.addEventListener("change", updateQuantityOptions);
@@ -282,7 +283,7 @@
             sizeRadios.forEach(function (radio) {
                 radio.addEventListener("change", updateQuantityOptions);
             });
-    
+        
             function updateQuantityOptions() {
                 console.log("更新數量選項...");
                 const selectedColor = getSelectedRadioValue(colorRadios);
@@ -320,7 +321,7 @@
                     stockSelect.appendChild(option);
                 }
             }
-    
+        
             function getSelectedRadioValue(radios) {
                 for (const radio of radios) {
                     if (radio.checked) {
@@ -329,7 +330,7 @@
                 }
                 return 0; // 如果未選擇任何選項
             }
-    
+        
             function generateQuantityOptions(stockQuantity) {
                 console.log("生成數量選項...");
                 const options = [];
@@ -344,8 +345,8 @@
                 } else {
                     console.log("Creating default option for stock quantity <= 0");
                     const option = document.createElement("option");
-                    option.value = "0";
-                    option.textContent = "0";
+                    option.value = "1";
+                    option.textContent = "1";
                     options.push(option);
                 }
                 return options;
@@ -354,7 +355,7 @@
     </script>    
     <script src="{% static './js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static './js/top.js' %}"></script>
-    <script src="{% static './js/up.js' %}"></script>
+    {% comment %} <script src="{% static './js/up.js' %}"></script> {% endcomment %}
     <script src="{% static 'js/doublecheck_login.js' %}"></script>
 </body>
 </html>

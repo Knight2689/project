@@ -447,7 +447,7 @@ def ordertable(request):  #商品訂單
                 q_objects.add(Q(total__contains=keyword), Q.OR)
             resultList = DetailModel.objects.filter(q_objects)
     else:    
-        resultList = DetailModel.objects.all().order_by('dorder_id')
+        resultList = DetailModel.objects.all().order_by('order_id')
         print('resultList=',resultList)
     if not resultList:
         errormessage = "無資料"
@@ -482,7 +482,7 @@ def productcreate(request):
         # 建立產品實例，並將影像關聯到產品中
         add = Products(product_name=product_name, price=price, type_id=type_id, color_id=color_id, size_id=size_id, stock=stock)
 
-        # 如果有图片，则将图片关联到商品中
+        # 如果有圖片，則將圖片關聯到商品中
         add = Products(product_name=product_name, price=price, stock=stock)
         if type_id:
             add.type = ProductTypeModel.objects.get(type_id=type_id)
@@ -653,7 +653,6 @@ def subject(request):  #首頁
     response.set_cookie("total_views", str(total_views), expires=expires)
 
     return render(request, "subject.html", locals())
-
 @csrf_exempt
 def login(request):  #登入
     if request.method == 'POST':
@@ -670,7 +669,7 @@ def login(request):  #登入
                 return redirect("/login/")
             else:
                 try:
-                    user = registered_user.objects.get(Usermail=Usermail, Passwd=Passwd)
+                    user = registered_user.objects.get(user_mail=Usermail, password=Passwd)
                 except registered_user.DoesNotExist:
                     user = None
                 if user is not None:
@@ -682,10 +681,10 @@ def login(request):  #登入
                     postform = forms.PostForm()
         # 返回登入表單頁面
         error_message = "信箱或密碼或驗證碼不正確"
-        return render(request, "login.html",locals())
+        return render(request, "login.html", locals())
     else:
         postform = forms.PostForm()
-        return render(request, "login.html",locals())
+        return render(request, "login.html", locals())
        
 @csrf_exempt
 def signup(request):  #註冊
@@ -713,11 +712,11 @@ def signup(request):  #註冊
         if Username=="" or Usersex =="" or Userbirthday=="" or Usertel=="" or Usermail=="" or Passwd=="" or Useraddress=="":
             return redirect("/signup/")
         try:
-            existing_user = registered_user.objects.filter(Usermail=Usermail).first()
+            existing_user = registered_user.objects.filter(user_mail=Usermail).first()
             if  existing_user:
                 return render(request, "signup.html", locals())
             else:
-                unit =registered_user.objects.create(Username=Username,Usersex=Usersex,Userbirthday=Userbirthday, Usertel= Usertel,Usermail=Usermail,Passwd=Passwd,Useraddress=Useraddress)
+                unit =registered_user.objects.create(username=Username,user_sex=Usersex,user_birthday=Userbirthday, user_tel= Usertel,user_mail=Usermail,password=Passwd,user_address=Useraddress)
                 unit.save()
                 server.login(strAccount, 'rrckulvlhcnxssmx')  # 登入 (信箱兩步驟驗證應用程式密碼)
                 server.sendmail(strAccount, mailto, msg.as_string())  # 寄信
@@ -893,9 +892,9 @@ def classification(request, type=None):  #分類頁面
     descriptions = DescriptionModel.objects.all()
     first_images = {}
     for i in products:
-        product_images = images.filter(Product_id=i.ProductID)
+        product_images = images.filter(product_id=i.product_id)
         if product_images:
-            first_images[i.ProductID] = product_images[0]
+            first_images[i.product_id] = product_images[0]
     page_name = 'subject'  # 此處使用您的頁面名稱
 
     # 查找或創建 PageView
@@ -917,68 +916,68 @@ def classification(request, type=None):  #分類頁面
     response = render(request, "subject.html", {"total_views": total_views, "daily_views": daily_views})
     response.set_cookie("total_views", str(total_views), expires=expires)
     if type == 'brand':
-        type = 'EncounterU品牌款'
-        products = products.filter(type__TypeName='EncounterU品牌款')
+        type = 'EncounterM品牌款'
+        products = products.filter(type__type_name='EncounterM品牌款')
     elif type == 'hot':
         type = '熱賣商品'
-        products = products.filter(type__TypeName='熱賣商品')
-    elif type == 'caot':
+        products = products.filter(type__type_name='熱賣商品')
+    elif type == 'coat':
         type = '外套'
-        products = products.filter(type__TypeName='外套')
+        products = products.filter(type__type_name='外套')
     elif type == 'short':
         type = '短袖'
-        products = products.filter(type__TypeName='短袖') 
+        products = products.filter(type__type_name='短袖') 
     elif type == 'sleeves':
         type = '長袖 / 7分袖'
-        products = products.filter(type__TypeName='長袖 / 7分袖') 
+        products = products.filter(type__type_name='長袖 / 7分袖') 
     elif type == 'vest':
         type = '背心'
-        products = products.filter(type__TypeName='背心') 
+        products = products.filter(type__type_name='背心') 
     elif type == 'shirt':
         type = '襯衫'
-        products = products.filter(type__TypeName='襯衫') 
+        products = products.filter(type__type_name='襯衫') 
     elif type == 'shorts':
         type = '短褲'
-        products = products.filter(type__TypeName='短褲') 
+        products = products.filter(type__type_name='短褲') 
     elif type == 'pants':
         type = '長褲'
-        products = products.filter(type__TypeName='長褲') 
+        products = products.filter(type__type_name='長褲') 
     elif type == 'jeans':
         type = '牛仔褲'
-        products = products.filter(type__TypeName='牛仔褲') 
+        products = products.filter(type__type_name='牛仔褲') 
     elif type == 'culottes':
         type = '短/長/褲裙'
-        products = products.filter(type__TypeName='短/長/褲裙') 
+        products = products.filter(type__type_name='短/長/褲裙') 
     elif type == 'overalls':
         type = '短/長吊帶褲'
-        products = products.filter(type__TypeName='短/長吊帶褲')
+        products = products.filter(type__type_name='短/長吊帶褲')
     elif type == 'sleevelessdress':
         type = '無袖洋裝'
-        products = products.filter(type__TypeName='無袖洋裝') 
+        products = products.filter(type__type_name='無袖洋裝') 
     elif type == 'shortsleevedress':
         type = '短袖洋裝'
-        products = products.filter(type__TypeName='短袖洋裝') 
+        products = products.filter(type__type_name='短袖洋裝') 
     elif type == 'longsleevedress':
         type = '長袖洋裝'
-        products = products.filter(type__TypeName='長袖洋裝') 
+        products = products.filter(type__type_name='長袖洋裝') 
     elif type == 'jumpsuit':
         type = '連身套裝'
-        products = products.filter(type__TypeName='連身套裝') 
+        products = products.filter(type__type_name='連身套裝') 
     elif type == 'suit':
         type = '無袖套裝'
-        products = products.filter(type__TypeName='無袖套裝') 
+        products = products.filter(type__type_name='無袖套裝') 
     elif type == 'shortsleevedresssuit':
         type = '短袖套裝'
-        products = products.filter(type__TypeName='短袖套裝') 
+        products = products.filter(type__type_name='短袖套裝') 
     elif type == 'longsleevedresssuit':
         type = '長袖套裝'
-        products = products.filter(type__TypeName='長袖套裝') 
+        products = products.filter(type__type_name='長袖套裝') 
     elif type == 'bag':
         type = '包包'
-        products = products.filter(type__TypeName='包包') 
+        products = products.filter(type__type_name='包包') 
     elif type == 'discount':
         type = '特價商品'
-        products = products.filter(type__TypeName='特價商品') 
+        products = products.filter(type__type_name='特價商品') 
    
     return render(request, "classification.html", locals())
 
@@ -1036,11 +1035,11 @@ def get_stock(request):  #獲取庫存數量
     Product_id = request.GET.get('Product_id')
     Color_id = request.GET.get('Color_id')
     Size_id = request.GET.get('Size_id')
-    Color_id = ColorModel.objects.get(ColorName=Color_id).color_id
-    Size_id = SizeModel.objects.get(SizeName=Size_id).size_id
+    Color_id = ColorModel.objects.get(color_name=Color_id).color_id
+    Size_id = SizeModel.objects.get(size_name=Size_id).size_id
     try:
-        stock = ProductColorSizeStockModel.objects.get(Product_id=Product_id, Color_id=Color_id, Size_id=Size_id)
-        stock_quantity = stock.Stock
+        stock = ProductColorSizeStockModel.objects.get(product=Product_id, color=Color_id, size=Size_id)
+        stock_quantity = stock.stock
     except ProductColorSizeStockModel.DoesNotExist:
         stock_quantity = 0
 
@@ -1051,27 +1050,27 @@ def addtocart(request, ctype=None, productid=None):  #加入購物車
     global cartlist
     if ctype == 'add':
         productall = Products.objects.all()
-        product = Products.objects.get(ProductID=productid)
+        product = Products.objects.get(product_id=productid)
         selected_color = request.POST.get('selectedColor')
         selected_size = request.POST.get('selectedSize')
         select_number = int(request.POST.get('stock'))
-        Color_id = ColorModel.objects.get(ColorName=selected_color).ColorID
-        Size_id = SizeModel.objects.get(SizeName=selected_size).SizeID
-        stock = ProductColorSizeStockModel.objects.get(Product_id=product, Color_id=Color_id, Size_id=Size_id)
-        stock_quantity = stock.Stock
-        images = ImageModel.objects.filter(Product_id=product)
+        Color_id = ColorModel.objects.get(color_name=selected_color).color_id
+        Size_id = SizeModel.objects.get(size_name=selected_size).size_id
+        stock = ProductColorSizeStockModel.objects.get(product=product, color=Color_id, size=Size_id)
+        stock_quantity = stock.stock
+        images = ImageModel.objects.filter(product_id=product)
         first_images = {}
         for i in productall:
-            product_images = images.filter(Product_id=i.ProductID)
+            product_images = images.filter(product_id=i.product_id)
             if product_images:
-                first_images[i.ProductID] = product_images[0]
-        image = first_images.get(product.ProductID, None)
+                first_images[i.product_id] = product_images[0]
+        image = first_images.get(product.product_id, None)
         # existing_item 設為 None
         existing_item = None
         for unit in cartlist:
             # 檢查購物車中是否已存在相同商品、顏色和尺寸的項目
             if (
-                unit[0] == product.ProductName
+                unit[0] == product.product_name
                 and unit[5] == selected_color
                 and unit[6] == selected_size
             ):
@@ -1084,11 +1083,11 @@ def addtocart(request, ctype=None, productid=None):  #加入購物車
         else:
             # 如果該項目不存在，將新項目添加到購物車
             temlist = [
-                product.ProductName,
-                str(product.Price),
+                product.product_name,
+                str(product.price),
                 str(select_number),
-                str(product.Price * select_number),
-                image.ImageName if image else "",  # 使用 image 變數的值，如果不存在，則為空字符串
+                str(product.price * select_number),
+                image.name if image else "",  # 使用 image 變數的值，如果不存在，則為空字符串
                 selected_color,
                 selected_size,
                 str(select_number),
@@ -1135,7 +1134,7 @@ def cart(request):  #購物車
     for i in productall:
         product_images = images.filter(product_id=i.product_id)
         if product_images:
-            first_images[i.ProductID] = product_images[0]
+            first_images[i.product_id] = product_images[0]
     cartnum = len(cartlist)  #購買商品筆數
     cartlist1 = cartlist  # 以區域變數傳給模版
     total = 0
@@ -1183,3 +1182,145 @@ def cartorder(request):  #確認訂單
     message1 = message_purchase
     return render(request, "cartorder.html", locals())
 
+
+@csrf_exempt
+def cartok(request):  # 订单完成
+    user_id = request.session.get('user_id')
+    if user_id:
+        user = registered_user.objects.get(id=user_id)
+    user = registered_user.objects.get(id=user_id)
+    global cartlist, message_purchase, subtotal, shipping, grandtotal, customname, customemail, customaddress, customphone, shipping_method, paytype
+    total = 0
+    cartlist = request.session['cartlist']
+    for unit in cartlist:
+        unit[2] = unit[7]
+        unit[3] = str(int(unit[1]) * int(unit[7]))
+        total += int(unit[1]) * int(unit[7])
+    subtotal = total
+    selected_shipping_method = request.POST.get('selected_shipping_method')
+    if selected_shipping_method == '7-11':
+        shipping_fee = 60
+    elif selected_shipping_method == '黑貓宅急便':
+        shipping_fee = 200
+    else:
+        shipping_fee = 0
+    shipping =  shipping_fee
+    grandtotal = subtotal + shipping
+    customname = request.POST.get('CustomerName', '')
+    customemail_str = user.user_mail
+    customaddress = request.POST.get('city', '') + request.POST.get('district', '') + request.POST.get('addressDetail', '')
+    customphone = request.POST.get('CustomerPhone', '')
+    shipping_method= request.POST.get('selected_shipping_method', '')
+    paytype = request.POST.get('payMethod', '')
+    print('subtotal=',subtotal,',shipping=',shipping,',grandtotal=',grandtotal,',customname=',customname,',customemail=',customemail_str,'\n,customaddress=',customaddress,',customphone=',customphone,',shipping_method=',shipping_method,',paytype=',paytype)
+    username = user.username
+    if customname=='' or customphone=='' or shipping_method=='' or customaddress=='' or paytype=='':
+        message_purchase = '姓名、手機、物流、地址及付款方式皆需選擇與輸入'
+        return redirect('/cartorder/')
+    else:
+        customemail = registered_user.objects.get(user_mail=customemail_str)
+        unitorder = OrdersModel.objects.create(subtotal=subtotal, shipping=shipping, grand_total=grandtotal, customer_name=customname, customer_email=customemail, customer_address=customaddress, customer_phone=customphone,  shipping_method=shipping_method, pay_type=paytype) #建立訂單
+        for unit in cartlist:
+            unit[2] = unit[7]
+            unit[3] = str(int(unit[1]) * int(unit[7]))
+
+            try:
+                # 查詢 Products 模型，找到對應的產品實例
+                product_instance = Products.objects.get(product_name=unit[1])
+            except Products.DoesNotExist:
+                # 處理找不到產品實例的情況
+                # 這裡簡單地列印一條錯誤訊息
+                print(f"Product with name '{unit[1]}' does not exist.")
+                # 如果找不到產品實例，則跳過目前循環，繼續處理下一個單位
+                continue
+
+            # 创建 DetailModel 实例时将产品实例传递给 product_name 字段
+            unitdetail = DetailModel.objects.create(order=unitorder, product_name=product_instance, color=unit[5], size=unit[6], unit_price=unit[1], quantity=unit[2], total=unit[3])
+
+        orderid = unitorder.id  #取得訂單id
+        strSmtp = "smtp.gmail.com:587"  # 主機
+        strAccount = "rc5601684797@gmail.com"  # 帳號
+        template = loader.get_template('ordernotificationemail.html')
+        context = {
+            'username' : username,
+            'orderid': orderid, 
+        }
+        body_part = MIMEText(template.render(context, request), "html")
+        msg = MIMEMultipart("alternative")  # 創建一個 MIMEMultipart 訊息
+        msg["Subject"] = "訂單通知信"  # 郵件標題
+        msg["From"] = strAccount
+        mailto = [customemail.user_mail]
+        msg.attach(body_part)  # 附加 HTML 內容到訊息中
+        server = SMTP(strSmtp)  # 建立SMTP連線
+        server.ehlo()  # 跟主機溝通
+        server.starttls()  # TTLS 安全認證
+        try:
+            server.login(strAccount, 'rrckulvlhcnxssmx')  # 登入 (信箱兩步驟驗證應用程式密碼)
+            server.sendmail(strAccount, mailto, msg.as_string())  # 寄信
+            hint = "郵件已發送！"
+        except SMTPAuthenticationError:
+            hint = "無法登入！"
+        except SMTPException as e:
+            hint = f"郵件發送產生錯誤: {str(e)}"
+        finally:
+            server.quit()  # 關閉連線
+        cartlist = []
+    request.session['cartlist'] = cartlist
+    return render(request, "cartok.html", locals())
+
+def ordernotificationemail(request):  #訂單通知信
+    return render(request, "ordernotificationemail.html", locals())
+
+@csrf_exempt
+def cartordercheck(request):  #訂單查詢
+	user_id = request.session.get('user_id')
+	if user_id:
+		user = registered_user.objects.get(id=user_id)	
+	user = registered_user.objects.get(id=user_id)
+	orderid = request.POST.get('orderid', '')  #取得輸入id
+	customemail = request.POST.get('customemail', '')  #取得輸入email
+	firstsearch = 0
+	notfound = 0
+	if orderid == '' and customemail == '':  #按查詢訂單鈕
+		firstsearch = 1
+	else:
+		if orderid:
+			order = OrdersModel.objects.filter(id=orderid).first()
+			if not order:
+				notfound = 1
+			else:
+				details = DetailModel.objects.filter(order=order)
+		elif customemail:
+			orders = OrdersModel.objects.filter(customemail=customemail)
+			if not orders:
+				notfound = 1
+			else:
+				details = DetailModel.objects.filter(order__in=orders)
+
+	return render(request, "cartordercheck.html", locals())
+
+@csrf_exempt
+def modifymemberprofile(request, id=None):  #修改資料
+    user_id = request.session.get('user_id', None)
+    print('user_id = ',user_id)
+    if 'user_id' in request.session:
+        if request.method == 'POST':
+            Usersex = request.POST['user_sex']
+            Userbirthday = request.POST['user_birthday']
+            Usertel = request.POST['user_tel']
+            Useraddress = request.POST['user_address']
+            update = registered_user.objects.get(id=user_id)
+            update.username = update.username
+            update.user_sex = Usersex
+            update.password = update.password
+            update.user_birthday = Userbirthday
+            update.user_mail = update.user_mail
+            update.user_tel = Usertel
+            update.user_address = Useraddress
+            update.save()
+            return redirect('/subject/')
+        else:
+            update = registered_user.objects.get(id=user_id)
+            return render(request, "modifymemberprofile.html", locals())
+    else:
+        return render(request, "login.html", locals())
