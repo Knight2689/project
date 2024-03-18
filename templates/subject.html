@@ -19,13 +19,13 @@
                         {% if user_id %}
                             <div>
                                 <a href="{% url 'logout' %}" id="sign_in">
-                                    <span class="bi bi-box-arrow-right id="member""></span> {{ user.Username }} / 登出
+                                    <span class="bi bi-box-arrow-right "id="member"></span> {{ user.Username }} / 登出
                                 </a>
                             </div>
                         {% else %}
                             <div>
                                 <a href="{% url 'login' %}" id="sign_in">
-                                    <span class="bi bi-box-arrow-right id="member""></span>  登入/註冊
+                                    <span class="bi bi-box-arrow-right "id="member"></span>  登入/註冊
                                 </a>
                             </div>
                         {% endif %}
