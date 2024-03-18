@@ -273,13 +273,13 @@ def listall(request):  #會員管理
                     q_objects.add(Q(Isblacklisted=1), Q.OR)
                 elif keyword == "否":
                     q_objects.add(Q(Isblacklisted=0), Q.OR)
-                q_objects.add(Q(Username__contains=keyword),Q.OR)
-                q_objects.add(Q(Usersex__contains=keyword),Q.OR)
-                q_objects.add(Q(Userbirthday__contains=keyword),Q.OR)
-                q_objects.add(Q(Usertel__contains=keyword),Q.OR)
-                q_objects.add(Q(Usermail__contains=keyword),Q.OR)
-                q_objects.add(Q(Passwd__contains=keyword),Q.OR)
-                q_objects.add(Q(Useraddress__contains=keyword),Q.OR)
+                q_objects.add(Q(userName__contains=keyword),Q.OR)
+                q_objects.add(Q(userSex__contains=keyword),Q.OR)
+                q_objects.add(Q(userBirthday__contains=keyword),Q.OR)
+                q_objects.add(Q(userTel__contains=keyword),Q.OR)
+                q_objects.add(Q(userMail__contains=keyword),Q.OR)
+                q_objects.add(Q(p_word__contains=keyword),Q.OR)
+                q_objects.add(Q(userAddress__contains=keyword),Q.OR)
             resultList = registered_user.objects.filter(q_objects)
     else:   
         resultList =  registered_user.objects.all().order_by('id') 
@@ -295,15 +295,15 @@ def listall(request):  #會員管理
 @csrf_exempt
 def createdata(request):  #新增會員管理
     if request.method =="POST":
-        Username = request.POST.get("user-name",None)
-        Usersex = request.POST.get("user-sex",None)
-        Userbirthday = request.POST.get("user-birthday",None)
-        Usertel = request.POST.get("user-tel",None)
-        Usermail= request.POST.get("user-mail",None)
-        Passwd = request.POST.get("pass-wd",None)
-        Useraddress= request.POST.get("user-address",None)
-        Isblacklisted= int(request.POST.get("Isblacklisted", 0))
-        add = registered_user(username=Username,user_sex=Usersex,user_birthday=Userbirthday,user_tel=Usertel,user_mail=Usermail,password=Passwd,user_address=Useraddress,is_blacklisted=Isblacklisted)
+        userName = request.POST.get("user-name",None)
+        userSex = request.POST.get("user-sex",None)
+        userBirthday = request.POST.get("user-birthday",None)
+        userTel = request.POST.get("user-tel",None)
+        userMail= request.POST.get("user-mail",None)
+        p_word = request.POST.get("pass-wd",None)
+        userAddress= request.POST.get("user-address",None)
+        isblackListed= int(request.POST.get("Isblacklisted", 0))
+        add = registered_user(username=userName,user_sex=userSex,user_birthday=userBirthday,user_tel=userTel,user_mail=userMail,password=p_word,user_address=userAddress,is_blacklisted=isblackListed)
         add.save()
         return redirect("/listall/")
         # return HttpResponse("Hello World")
@@ -313,24 +313,24 @@ def createdata(request):  #新增會員管理
 @csrf_exempt
 def edit(request, id=None):  #編輯會員管理
     if request.method == "POST":
-        Username=request.POST['Username']
-        Usersex=request.POST['Usersex']
-        Passwd=request.POST['Passwd']
-        Userbirthday=request.POST['Userbirthday']
-        Usermail=request.POST['Usermail']
-        Usertel=request.POST['Usertel']
-        Useraddress=request.POST['Useraddress']
-        Isblacklisted= int(request.POST.get("Isblacklisted", 0))
+        userName=request.POST['userName']
+        userSex=request.POST['userSex']
+        p_word=request.POST['p_word']
+        userBirthday=request.POST['userBirthday']
+        userMail=request.POST['userMail']
+        userTel=request.POST['userTel']
+        userAddress=request.POST['userAddress']
+        isblackListed= int(request.POST.get("isblackListed", 0))
 
         update = registered_user.objects.get(id=id)
-        update.username = Username
-        update.user_sex = Usersex
-        update.password = Passwd
-        update.user_birthday = Userbirthday
-        update.user_mail = Usermail
-        update.user_tel = Usertel
-        update.user_address = Useraddress
-        update.is_blacklisted = Isblacklisted
+        update.username = userName
+        update.user_sex = userSex
+        update.password = p_word
+        update.user_birthday = userBirthday
+        update.user_mail = userMail
+        update.user_tel = userTel
+        update.user_address = userAddress
+        update.is_blacklisted = isblackListed
         update.save()
         return redirect('/listall/')
     
@@ -340,11 +340,12 @@ def edit(request, id=None):  #編輯會員管理
         return render(request,"edit.html",locals())    
     
 @csrf_exempt    
-def delete(request, id=None):  #刪除會員管理
+def delete(request, id=None):  #停用會員管理
     # print(id)
     if request.method == "POST":
         data = registered_user.objects.get(id=id)
-        data.delete()
+        data.is_active = False # 將會員標記為已停用或隱藏而不是刪除
+        #data.delete()
         return redirect("/listall/")
     else:
         dict_data = registered_user.objects.get(id=id)
@@ -368,8 +369,8 @@ def orders(request):  # 收件管理
                 elif keyword == "否":
                     q_objects.add(Q(customer_email__Isblacklisted=0), Q.OR)
                 q_objects.add(Q(id__contains=keyword),Q.OR)
-                q_objects.add(Q(customer_email__Username__contains=keyword),Q.OR)
-                q_objects.add(Q(customer_email__Usermail__contains=keyword),Q.OR)
+                q_objects.add(Q(customer_email__userName__contains=keyword),Q.OR)
+                q_objects.add(Q(customer_email__userMail__contains=keyword),Q.OR)
                 q_objects.add(Q(customer_name__contains=keyword),Q.OR)
                 q_objects.add(Q(customer_phone__contains=keyword),Q.OR)
                 q_objects.add(Q(shipping_method__contains=keyword),Q.OR)
@@ -689,15 +690,15 @@ def login(request):  #登入
 @csrf_exempt
 def signup(request):  #註冊
     if request.method == "POST":
-        Username = request.POST.get("user-name",'')
-        Usersex = request.POST.get("user-sex",'')
-        Userbirthday = request.POST.get("user-birthday",'')
-        Usertel = request.POST.get("user-tel",'')
-        Usermail= request.POST.get("user-mail",'')
-        Passwd = request.POST.get("pass-wd",'')
-        Useraddress= request.POST.get("user-address",'')
+        username = request.POST.get("user-name",'')
+        usersex = request.POST.get("user-sex",'')
+        userbirthday = request.POST.get("user-birthday",'')
+        usertel = request.POST.get("user-tel",'')
+        usermail= request.POST.get("user-mail",'')
+        p_word = request.POST.get("pass-wd",'')
+        useraddress= request.POST.get("user-address",'')
         strSmtp = "smtp.gmail.com:587"  # 主機
-        strAccount = "rc5601684797@gmail.com"  # 帳號
+        strAccount = "帳號"  # 帳號
         template = loader.get_template('signupsuccessfulemail.html')
         content = ""  # 郵件內容
         msg = MIMEMultipart("alternative")  # 創建一個 MIMEMultipart 訊息
@@ -709,16 +710,16 @@ def signup(request):  #註冊
         server = SMTP(strSmtp)  # 建立SMTP連線
         server.ehlo()  # 跟主機溝通
         server.starttls()  # TTLS 安全認證
-        if Username=="" or Usersex =="" or Userbirthday=="" or Usertel=="" or Usermail=="" or Passwd=="" or Useraddress=="":
+        if username=="" or usersex =="" or userbirthday=="" or usertel=="" or usermail=="" or p_word=="" or useraddress=="":
             return redirect("/signup/")
         try:
             existing_user = registered_user.objects.filter(user_mail=Usermail).first()
             if  existing_user:
                 return render(request, "signup.html", locals())
             else:
-                unit =registered_user.objects.create(username=Username,user_sex=Usersex,user_birthday=Userbirthday, user_tel= Usertel,user_mail=Usermail,password=Passwd,user_address=Useraddress)
+                unit =registered_user.objects.create(username=username,user_sex=usersex,user_birthday=userbirthday, user_tel= usertel,user_mail=usermail,password=p_word,user_address=useraddress)
                 unit.save()
-                server.login(strAccount, 'rrckulvlhcnxssmx')  # 登入 (信箱兩步驟驗證應用程式密碼)
+                server.login(strAccount, '信箱兩步驟驗證應用程式密碼')  # 登入 (信箱兩步驟驗證應用程式密碼)
                 server.sendmail(strAccount, mailto, msg.as_string())  # 寄信
                 hint = "郵件已發送！"
                 return render(request, "signupsuccessful.html", locals())
@@ -763,7 +764,7 @@ def getpassword(request):  #忘記密碼
         user.save()
     
         strSmtp = "smtp.gmail.com:587"  # 主機
-        strAccount = "rc5601684797@gmail.com"  # 帳號
+        strAccount = "帳號@gmail.com"  # 帳號
         template = loader.get_template('resetpasswordemail.html')
         content = ""  # 郵件內容
         msg = MIMEMultipart("alternative")  # 創建一個 MIMEMultipart 訊息
@@ -776,7 +777,7 @@ def getpassword(request):  #忘記密碼
         server.ehlo()  # 跟主機溝通
         server.starttls()  # TTLS 安全認證
         try:
-            server.login(strAccount, 'rrckulvlhcnxssmx')  # 登入 (信箱兩步驟驗證應用程式密碼)
+            server.login(strAccount, '信箱兩步驟驗證應用程式密碼')  # 登入 (信箱兩步驟驗證應用程式密碼)
             server.sendmail(strAccount, mailto, msg.as_string())  # 寄信
             hint = "郵件已發送！"
         except SMTPAuthenticationError:
@@ -810,7 +811,7 @@ def resetpassword(request):  #重設Encounter M服飾會員
                 update.Passwd = Newpasswd 
                 update.save() 
                 strSmtp = "smtp.gmail.com:587"  # 主機
-                strAccount = "rc5601684797@gmail.com"  # 帳號
+                strAccount = "帳號@gmail.com"  # 帳號
                 template = loader.get_template('resetpasswordsuccessfulemail.html')
                 content = ""  # 郵件內容
                 msg = MIMEMultipart("alternative")  # 創建一個 MIMEMultipart 訊息
@@ -823,7 +824,7 @@ def resetpassword(request):  #重設Encounter M服飾會員
                 server.ehlo()  # 跟主機溝通
                 server.starttls()  # TTLS 安全認證
                 try:
-                    server.login(strAccount, 'rrckulvlhcnxssmx')  # 登入 (信箱兩步驟驗證應用程式密碼)
+                    server.login(strAccount, '信箱兩步驟驗證應用程式密碼')  # 登入 (信箱兩步驟驗證應用程式密碼)
                     server.sendmail(strAccount, mailto, msg.as_string())  # 寄信
                     hint = "郵件已發送！"
                 except SMTPAuthenticationError:
@@ -1184,7 +1185,7 @@ def cartorder(request):  #確認訂單
 
 
 @csrf_exempt
-def cartok(request):  # 订单完成
+def cartok(request):  # 訂單完成
     user_id = request.session.get('user_id')
     if user_id:
         user = registered_user.objects.get(id=user_id)
@@ -1234,12 +1235,12 @@ def cartok(request):  # 订单完成
                 # 如果找不到產品實例，則跳過目前循環，繼續處理下一個單位
                 continue
 
-            # 创建 DetailModel 实例时将产品实例传递给 product_name 字段
+            # 建立 DetailModel 實例時將產品實例傳遞給 product_name 字段
             unitdetail = DetailModel.objects.create(order=unitorder, product_name=product_instance, color=unit[5], size=unit[6], unit_price=unit[1], quantity=unit[2], total=unit[3])
 
         orderid = unitorder.id  #取得訂單id
         strSmtp = "smtp.gmail.com:587"  # 主機
-        strAccount = "rc5601684797@gmail.com"  # 帳號
+        strAccount = "帳號@gmail.com"  # 帳號
         template = loader.get_template('ordernotificationemail.html')
         context = {
             'username' : username,
@@ -1255,7 +1256,7 @@ def cartok(request):  # 订单完成
         server.ehlo()  # 跟主機溝通
         server.starttls()  # TTLS 安全認證
         try:
-            server.login(strAccount, 'rrckulvlhcnxssmx')  # 登入 (信箱兩步驟驗證應用程式密碼)
+            server.login(strAccount, '信箱兩步驟驗證應用程式密碼')  # 登入 (信箱兩步驟驗證應用程式密碼)
             server.sendmail(strAccount, mailto, msg.as_string())  # 寄信
             hint = "郵件已發送！"
         except SMTPAuthenticationError:

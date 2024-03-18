@@ -30,6 +30,8 @@ class registered_user(models.Model):
     user_address = models.CharField(max_length=255, blank=True, default='')
     # 黑名單欄位
     is_blacklisted = models.BooleanField(default=False)
+    # 活動狀態
+    is_active = models.BooleanField(default=True)
 
 # 訂單模型
 class OrdersModel(models.Model):

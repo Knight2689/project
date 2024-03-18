@@ -190,23 +190,21 @@
             <div class="col-12 col-md-6 col-lg-3">
                 <div class="card mt-2" id="card">
                     <div class="card-header">
-                        {% for product_id, first_image in first_images.items %}
-                            {% if first_image.Product_id == product %}
-                                <img class="card-img-bottom rounded mx-auto d-block" src="{% static 'images/' %}{{ first_image.ImageName  }}"/>
-                            {% endif %}
-                        {% endfor %}
+                        {% if product.images.exists %}
+                            <img class="card-img-bottom rounded mx-auto d-block" src="{{ product.images.first.image.url }}" />
+                        {% endif %}
                     </div>
                     <div class="card-body" id="card_body">
-                        <div class="card-tittle h5">#{{ product.ProductName }}</div> 
+                        <div class="card-tittle h5">#{{ product.product_name }}</div> 
                         {% for description in descriptions %}
-                            {% if description.Product_id == product %}
-                                <div class="card-text pb-3">{{ description.Description }}</div>  
+                            {% if description.product == product %}
+                                <div class="card-text pb-3">{{ description.description }}</div>  
                             {% endif %}
                         {% endfor %}
                     </div>
                     <div class="card-footer" id="card_footer">
                         <div class="card-text pb-3 text-front" id="nowrap">
-                            NT${{ product.Price }} &nbsp;<a href="/productcontent/{{ product.ProductID }}" class="btn btn-outline-primary btn-lg">相關資訊</a>
+                            NT${{ product.price }} &nbsp;<a href="/productcontent/{{ product.product_id }}" class="btn btn-outline-primary btn-lg">相關資訊</a>
                         </div>
                     </div>
                 </div>
