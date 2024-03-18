@@ -344,7 +344,7 @@ def delete(request, id=None):  #停用會員管理
     # print(id)
     if request.method == "POST":
         data = registered_user.objects.get(id=id)
-        data.is_active = False # 將會員標記為已停用或隱藏而不是刪除
+        data.status = 2 # 將會員標記為已停用或隱藏而不是刪除
         #data.delete()
         return redirect("/listall/")
     else:
